@@ -79,7 +79,25 @@ Token 通过 `POST /api/auth/login` 获取，有效期 24 小时。
 
 ---
 
-### 1.2 获取当前用户信息
+### 1.2 用户登出
+
+**`POST /api/auth/logout`**
+
+验证当前 Token 有效后返回 204。前端收到后应清除本地存储的 Token。
+
+**成功响应 `204`：** 无响应体。
+
+**错误响应：**
+
+| 状态码 | detail |
+|--------|--------|
+| 401 | 未认证或 Token 无效 |
+
+---
+
+### 1.3 获取当前用户信息
+
+**`GET /api/auth/me`**
 
 **`GET /api/auth/me`**
 
@@ -96,7 +114,7 @@ Token 通过 `POST /api/auth/login` 获取，有效期 24 小时。
 
 ---
 
-### 1.3 注册新用户
+### 1.4 注册新用户
 
 **`POST /api/auth/register`**
 
