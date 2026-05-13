@@ -74,7 +74,14 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
           {selectedLineupId ? (
             <LineupDetail lineup={lineupDetail} loading={detailLoading} onBack={handleBack} />
           ) : (
-            <LineupGrid lineups={lineups} total={total} loading={loading} onSelect={handleSelectLineup} />
+            <LineupGrid
+              lineups={lineups}
+              total={total}
+              loading={loading}
+              onSelect={handleSelectLineup}
+              canCreate={user.role === 'admin' || user.role === 'author'}
+              onCreated={fetchLineups}
+            />
           )}
         </div>
       </div>
