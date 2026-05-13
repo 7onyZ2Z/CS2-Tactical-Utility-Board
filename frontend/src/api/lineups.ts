@@ -23,3 +23,11 @@ export async function createLineup(data: {
   const res = await client.post<LineupResponse>('/api/lineups', data);
   return res.data;
 }
+
+export async function uploadMedia(lineupId: number, file: File, fileType: string = 'image'): Promise<void> {
+  const formData = new FormData();
+  formData.append('file', file);
+  await client.post(`/api/lineups/${lineupId}/media?file_type=${fileType}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+}

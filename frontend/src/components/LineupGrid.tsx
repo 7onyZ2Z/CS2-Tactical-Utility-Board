@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Spin, Button, Modal, Form, Input, InputNumber, Select, message } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Spin, Button, Modal, Form, Input, InputNumber, Select, Upload, message } from 'antd';
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import type { UploadFile } from 'antd';
 import type { LineupResponse, MapResponse } from '../types';
-import { createLineup } from '../api/lineups';
+import { createLineup, uploadMedia } from '../api/lineups';
 import { listMaps } from '../api/maps';
 import { UTILITY_TYPES, SIDES } from './Sidebar';
 import LineupCard from './LineupCard';
@@ -20,6 +21,7 @@ export default function LineupGrid({ lineups, total, loading, onSelect, canCreat
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [maps, setMaps] = useState<MapResponse[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -39,16 +41,28 @@ export default function LineupGrid({ lineups, total, loading, onSelect, canCreat
   }) => {
     setConfirmLoading(true);
     try {
-      await createLineup(values);
+      const lineup = await createLineup(values);
+      for (const f of fileList) {
+        if (f.originFileObj) {
+          await uploadMedia(lineup.id, f.originFileObj, 'image');
+        }
+      }
       message.success('创建成功');
       setModalOpen(false);
       form.resetFields();
+      setFileList([]);
       onCreated();
     } catch {
       message.error('创建失败');
     } finally {
       setConfirmLoading(false);
     }
+  };
+
+  const handleCancel = () => {
+    setModalOpen(false);
+    form.resetFields();
+    setFileList([]);
   };
 
   if (loading) {
@@ -87,7 +101,7 @@ export default function LineupGrid({ lineups, total, loading, onSelect, canCreat
       <Modal
         title="新增道具点位"
         open={modalOpen}
-        onCancel={() => { setModalOpen(false); form.resetFields(); }}
+        onCancel={handleCancel}
         onOk={() => form.submit()}
         confirmLoading={confirmLoading}
         okText="创建"
@@ -130,6 +144,23 @@ export default function LineupGrid({ lineups, total, loading, onSelect, canCreat
           </div>
           <Form.Item name="description" label="描述">
             <Input.TextArea rows={3} placeholder="投掷方法描述（可选）" />
+          </Form.Item>
+          <Form.Item label="图片">
+            <Upload
+              listType="picture-card"
+              fileList={fileList}
+              beforeUpload={() => false}
+              onChange={({ fileList: newList }) => setFileList(newList)}
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+            >
+              {fileList.length < 5 && (
+                <div style={{ color: '#8b949e' }}>
+                  <UploadOutlined />
+                  <div style={{ fontSize: 12, marginTop: 4 }}>上传图片</div>
+                </div>
+              )}
+            </Upload>
           </Form.Item>
         </Form>
       </Modal>
