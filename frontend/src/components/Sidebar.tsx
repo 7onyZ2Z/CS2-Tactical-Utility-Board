@@ -14,6 +14,19 @@ export const SIDES = [
   { value: 't', label: 'T' },
 ] as const;
 
+const MAP_ICONS: Record<string, string> = {
+  dust2: '/map_icon/de_dust2.png',
+  mirage: '/map_icon/de_mirage.png',
+  inferno: '/map_icon/de_inferno.png',
+  nuke: '/map_icon/de_nuke.png',
+  overpass: '/map_icon/de_overpass.png',
+  ancient: '/map_icon/de_ancient.png',
+  anubis: '/map_icon/de_anubis.png',
+  vertigo: '/map_icon/de_vertigo.png',
+  cache: '/map_icon/de_cache.png',
+  train: '/map_icon/de_train.png',
+};
+
 interface SidebarProps {
   selectedMap: number | null;
   selectedUtility: string | null;
@@ -38,9 +51,9 @@ export default function Sidebar({
   }, []);
 
   const btnStyle = (active: boolean): React.CSSProperties => ({
-    padding: '6px 8px',
+    padding: '4px 6px',
     borderRadius: 4,
-    fontSize: 12,
+    fontSize: 11,
     textAlign: 'center' as const,
     cursor: 'pointer',
     transition: 'all 0.2s',
@@ -48,6 +61,10 @@ export default function Sidebar({
     color: active ? '#0d1117' : '#c9d1d9',
     fontWeight: active ? 'bold' : 'normal',
     border: active ? 'none' : '1px solid #30363d',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 2,
   });
 
   const sectionLabel: React.CSSProperties = {
@@ -60,7 +77,7 @@ export default function Sidebar({
 
   return (
     <div style={{
-      width: 200,
+      width: 210,
       flexShrink: 0,
       background: '#161b22',
       borderRight: '1px solid #21262d',
@@ -75,7 +92,14 @@ export default function Sidebar({
             style={btnStyle(selectedMap === m.id)}
             onClick={() => onMapChange(selectedMap === m.id ? null : m.id)}
           >
-            {m.display_name}
+            {MAP_ICONS[m.name] && (
+              <img
+                src={MAP_ICONS[m.name]}
+                alt={m.display_name}
+                style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 2 }}
+              />
+            )}
+            <span>{m.display_name}</span>
           </div>
         ))}
       </div>
