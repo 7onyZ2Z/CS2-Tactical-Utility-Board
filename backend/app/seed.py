@@ -4,15 +4,16 @@ from .auth import hash_password
 from .models import Map, User
 
 MAPS = [
-    ("dust2", "Dust II"),
-    ("mirage", "Mirage"),
-    ("inferno", "Inferno"),
-    ("nuke", "Nuke"),
-    ("overpass", "Overpass"),
-    ("ancient", "Ancient"),
-    ("anubis", "Anubis"),
-    ("vertigo", "Vertigo"),
-    ("cache", "Cache"),
+    ("dust2", "Dust II", "de_dust2.png"),
+    ("mirage", "Mirage", "de_mirage.png"),
+    ("inferno", "Inferno", "de_inferno.png"),
+    ("nuke", "Nuke", "de_nuke.png"),
+    ("overpass", "Overpass", "de_overpass.png"),
+    ("ancient", "Ancient", "de_ancient.png"),
+    ("anubis", "Anubis", "de_anubis.png"),
+    ("vertigo", "Vertigo", "de_vertigo.png"),
+    ("cache", "Cache", "de_cache.png"),
+    ("train", "Train", "de_train.png"),
 ]
 
 
@@ -25,8 +26,12 @@ def seed(db: Session):
         )
         db.add(admin)
 
-    for name, display_name in MAPS:
-        if not db.query(Map).filter(Map.name == name).first():
-            db.add(Map(name=name, display_name=display_name))
+    for name, display_name, image_file in MAPS:
+        existing = db.query(Map).filter(Map.name == name).first()
+        image_url = f"uploads/map/{image_file}"
+        if not existing:
+            db.add(Map(name=name, display_name=display_name, image_url=image_url))
+        elif not existing.image_url:
+            existing.image_url = image_url
 
     db.commit()
