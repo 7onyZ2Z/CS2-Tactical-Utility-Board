@@ -208,7 +208,7 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
                   }}>
                     <Image
                       src={`/${m.file_path}`}
-                      preview={{ mask: '点击查看原图' }}
+                      preview={false}
                       style={{ maxWidth: '100%', maxHeight: '100%' }}
                       rootClassName="carousel-img"
                     />
