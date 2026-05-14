@@ -21,6 +21,8 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
   const [selectedSide, setSelectedSide] = useState<string | null>(null);
   const [lineups, setLineups] = useState<LineupResponse[]>([]);
   const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
   const [loading, setLoading] = useState(false);
 
   const [selectedLineupId, setSelectedLineupId] = useState<number | null>(null);
@@ -36,12 +38,18 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
         map_id: selectedMap ?? undefined,
         utility_type: selectedUtility ?? undefined,
         side: selectedSide ?? undefined,
+        page,
+        page_size: pageSize,
       });
       setLineups(res.items);
       setTotal(res.total);
     } finally {
       setLoading(false);
     }
+  }, [selectedMap, selectedUtility, selectedSide, page, pageSize]);
+
+  useEffect(() => {
+    setPage(1);
   }, [selectedMap, selectedUtility, selectedSide]);
 
   useEffect(() => {
@@ -124,10 +132,13 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
       <LineupGrid
         lineups={lineups}
         total={total}
+        page={page}
+        pageSize={pageSize}
         loading={loading}
         onSelect={handleSelectLineup}
         canCreate={user.role === 'admin' || user.role === 'author'}
         onCreated={fetchLineups}
+        onPageChange={(p, ps) => { setPage(p); setPageSize(ps); }}
       />
     );
   };

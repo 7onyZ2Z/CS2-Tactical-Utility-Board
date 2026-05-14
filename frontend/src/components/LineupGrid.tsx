@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Spin, Button, Modal, Form, Input, Select, Upload, message } from 'antd';
+import { Spin, Button, Modal, Form, Input, Select, Upload, Pagination, message } from 'antd';
 import { PlusOutlined, UploadOutlined, AimOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd';
 import type { LineupResponse, MapResponse } from '../types';
@@ -12,13 +12,16 @@ import RadarPicker from './RadarPicker';
 interface LineupGridProps {
   lineups: LineupResponse[];
   total: number;
+  page: number;
+  pageSize: number;
   loading: boolean;
   onSelect: (id: number) => void;
   canCreate: boolean;
   onCreated: () => void;
+  onPageChange: (page: number, pageSize: number) => void;
 }
 
-export default function LineupGrid({ lineups, total, loading, onSelect, canCreate, onCreated }: LineupGridProps) {
+export default function LineupGrid({ lineups, total, page, pageSize, loading, onSelect, canCreate, onCreated, onPageChange }: LineupGridProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [maps, setMaps] = useState<MapResponse[]>([]);
@@ -97,6 +100,17 @@ export default function LineupGrid({ lineups, total, loading, onSelect, canCreat
           </div>
         ))}
       </div>
+      {total > pageSize && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+          <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={total}
+            onChange={(p) => onPageChange(p, pageSize)}
+            size="small"
+          />
+        </div>
+      )}
       {lineups.length === 0 && (
         <div style={{ textAlign: 'center', color: '#8b949e', padding: 80 }}>
           暂无匹配的道具点位
