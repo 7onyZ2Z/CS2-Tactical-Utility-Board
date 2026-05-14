@@ -84,6 +84,7 @@ class TacticResponse(BaseModel):
     description: Optional[str] = None
     positions: Optional[dict[str, Optional[PositionData]]] = None
     map_id: int
+    created_by: int
 
     model_config = {"from_attributes": True}
 

@@ -48,6 +48,7 @@ class Tactic(Base):
     description = Column(Text, nullable=True)
     positions = Column(JSON, nullable=True)
     map_id = Column(Integer, ForeignKey("maps.id"), nullable=False, index=True)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
 
     map = relationship("Map", back_populates="tactics")
 

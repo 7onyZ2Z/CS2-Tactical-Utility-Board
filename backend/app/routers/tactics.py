@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..dependencies import get_current_user, require_role
-from ..models import Tactic, Map, User
+from ..models import Lineup, Tactic, Map, User
 from ..schemas import TacticCreate, TacticResponse, TacticUpdate
 
 router = APIRouter(prefix="/api/tactics", tags=["tactics"])
@@ -46,7 +46,7 @@ def create_tactic(
     positions_data = None
     if body.positions:
         positions_data = {k: (v.model_dump() if v else None) for k, v in body.positions.items()}
-    tactic = Tactic(name=body.name, category=body.category, description=body.description, positions=positions_data, map_id=body.map_id)
+    tactic = Tactic(name=body.name, category=body.category, description=body.description, positions=positions_data, map_id=body.map_id, created_by=_current_user.id)
     db.add(tactic)
     db.commit()
     db.refresh(tactic)
@@ -58,11 +58,13 @@ def update_tactic(
     tactic_id: int,
     body: TacticUpdate,
     db: Session = Depends(get_db),
-    _current_user: User = Depends(require_role("admin", "author")),
+    current_user: User = Depends(require_role("admin", "author")),
 ):
     tactic = db.query(Tactic).filter(Tactic.id == tactic_id).first()
     if not tactic:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tactic not found")
+    if current_user.role != "admin" and tactic.created_by != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to edit this tactic")
     update_data = body.model_dump(exclude_unset=True)
     if "map_id" in update_data and not db.query(Map).filter(Map.id == update_data["map_id"]).first():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Map not found")
@@ -79,10 +81,19 @@ def update_tactic(
 def delete_tactic(
     tactic_id: int,
     db: Session = Depends(get_db),
-    _current_user: User = Depends(require_role("admin", "author")),
+    current_user: User = Depends(require_role("admin", "author")),
 ):
     tactic = db.query(Tactic).filter(Tactic.id == tactic_id).first()
     if not tactic:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tactic not found")
+    if current_user.role != "admin" and tactic.created_by != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this tactic")
+
+    for lineup in db.query(Lineup).all():
+        if lineup.tactics:
+            new_tactics = [t for t in lineup.tactics if t.get("tactic_id") != tactic_id]
+            if len(new_tactics) != len(lineup.tactics):
+                lineup.tactics = new_tactics if new_tactics else None
+
     db.delete(tactic)
     db.commit()

@@ -83,4 +83,5 @@ export interface TacticResponse {
   description?: string | null;
   positions: Record<string, PositionData | null> | null;
   map_id: number;
+  created_by: number;
 }

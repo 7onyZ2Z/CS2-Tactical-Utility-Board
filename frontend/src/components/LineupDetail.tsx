@@ -325,7 +325,7 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
             </span>
           )}
         </div>
-        {user.role === 'admin' || lineup.created_by === user.id ? (
+        {(user.role === 'admin' || lineup.created_by === user.id) && (
           <Button
             danger
             icon={<DeleteOutlined />}
@@ -337,20 +337,6 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
                 okType: 'danger',
                 cancelText: '取消',
                 onOk: () => onDelete(lineup.id),
-              });
-            }}
-          >
-            删除点位
-          </Button>
-        ) : (
-          <Button
-            disabled
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              Modal.info({
-                title: '无权限',
-                content: '该道具非你创建，没有权限删除',
-                okText: '知道了',
               });
             }}
           >

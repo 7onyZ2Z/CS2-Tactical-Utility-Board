@@ -48,6 +48,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
   const [selectLoading, setSelectLoading] = useState(false);
 
   const canCreate = user.role === 'admin' || user.role === 'author';
+  const canDelete = user.role === 'admin' || tactic.created_by === user.id;
   const mapInfo = maps.find((m) => m.id === tactic.map_id);
   const mapIcon = mapInfo ? MAP_ICONS[mapInfo.name] : null;
   const isMultiLevel = mapInfo ? MULTI_LEVEL_MAPS.has(mapInfo.name) : false;
@@ -224,7 +225,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
               添加道具
             </Button>
           )}
-          {canCreate && (
+          {canDelete && (
             <Button
               danger
               size="small"
