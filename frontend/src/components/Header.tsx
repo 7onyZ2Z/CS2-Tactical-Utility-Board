@@ -1,13 +1,15 @@
 import { Popconfirm } from 'antd';
-import { LogoutOutlined } from '@ant-design/icons';
+import { LogoutOutlined, SwapOutlined } from '@ant-design/icons';
 import type { UserResponse } from '../types';
 
 interface HeaderProps {
   user: UserResponse;
+  view: 'lineups' | 'tactics';
+  onViewChange: (view: 'lineups' | 'tactics') => void;
   onLogout: () => void;
 }
 
-export default function Header({ user, onLogout }: HeaderProps) {
+export default function Header({ user, view, onViewChange, onLogout }: HeaderProps) {
   return (
     <div style={{
       display: 'flex',
@@ -18,8 +20,22 @@ export default function Header({ user, onLogout }: HeaderProps) {
       background: '#161b22',
       borderBottom: '1px solid #21262d',
     }}>
-      <span style={{ color: '#4ade80', fontSize: 18, fontWeight: 'bold', letterSpacing: 2 }}>
-        脑力学院
+      <span
+        onClick={() => onViewChange(view === 'tactics' ? 'lineups' : 'tactics')}
+        style={{
+          color: '#4ade80',
+          fontSize: 18,
+          fontWeight: 'bold',
+          letterSpacing: 2,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          transition: 'opacity 0.2s',
+        }}
+      >
+        {view === 'tactics' ? '战术学院' : '道具学院'}
+        <SwapOutlined style={{ fontSize: 12, opacity: 0.5 }} />
       </span>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <span style={{ color: '#8b949e', fontSize: 14 }}>{user.username}</span>

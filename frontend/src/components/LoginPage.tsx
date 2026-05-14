@@ -37,7 +37,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             letterSpacing: 4,
             margin: 0,
           }}>
-            脑力学院
+            道具学院
           </h1>
           <p style={{ color: '#8b949e', marginTop: 8, fontSize: 14 }}>
             CS2 道具点位速查

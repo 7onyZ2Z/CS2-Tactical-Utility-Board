@@ -30,6 +30,11 @@ export interface MediaResponse {
   sort_order: number;
 }
 
+export interface TacticAssignment {
+  tactic_id: number;
+  executor: number | null;
+}
+
 export interface LineupResponse {
   id: number;
   name: string;
@@ -38,7 +43,9 @@ export interface LineupResponse {
   side: string;
   pos_x: number | null;
   pos_y: number | null;
+  pos_z: number;
   description: string | null;
+  tactics: TacticAssignment[] | null;
   created_by: number;
   created_at: string;
   updated_at: string;
@@ -56,7 +63,24 @@ export interface LineupQueryParams {
   map_id?: number;
   utility_type?: string;
   side?: string;
+  tactic_id?: number;
   keyword?: string;
   page?: number;
   page_size?: number;
+}
+
+export interface PositionData {
+  x: number;
+  y: number;
+  z: number;
+  duty?: string | null;
+}
+
+export interface TacticResponse {
+  id: number;
+  name: string;
+  category: string;
+  description?: string | null;
+  positions: Record<string, PositionData | null> | null;
+  map_id: number;
 }

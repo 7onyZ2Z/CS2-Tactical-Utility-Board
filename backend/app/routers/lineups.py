@@ -1,3 +1,4 @@
+import json
 import os
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -5,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from ..database import get_db
 from ..dependencies import get_current_user, require_role
-from ..models import Lineup, Map, User
+from ..models import Lineup, Map, Tactic, User
 from ..schemas import LineupCreate, LineupListResponse, LineupResponse, LineupUpdate
 
 router = APIRouter(prefix="/api/lineups", tags=["lineups"])
@@ -16,6 +17,7 @@ def list_lineups(
     map_id: int | None = None,
     utility_type: str | None = None,
     side: str | None = None,
+    tactic_id: int | None = None,
     keyword: str | None = None,
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
@@ -32,6 +34,17 @@ def list_lineups(
         query = query.filter(Lineup.side == side)
     if keyword:
         query = query.filter(Lineup.name.ilike(f"%{keyword}%"))
+
+    if tactic_id is not None:
+        all_lineups = query.order_by(Lineup.created_at.desc()).all()
+        filtered = [
+            l for l in all_lineups
+            if l.tactics and any(t.get("tactic_id") == tactic_id for t in l.tactics)
+        ]
+        total = len(filtered)
+        start = (page - 1) * page_size
+        items = filtered[start:start + page_size]
+        return LineupListResponse(items=items, total=total, page=page, page_size=page_size)
 
     total = query.count()
     items = (
@@ -79,6 +92,16 @@ def create_lineup(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="side must be ct or t",
         )
+
+    tactics_data = None
+    if body.tactics:
+        for t in body.tactics:
+            if not db.query(Tactic).filter(Tactic.id == t.tactic_id).first():
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Tactic {t.tactic_id} not found")
+            if t.executor is not None and (t.executor < 1 or t.executor > 5):
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="executor must be between 1 and 5")
+        tactics_data = [t.model_dump() for t in body.tactics]
+
     lineup = Lineup(
         name=body.name,
         map_id=body.map_id,
@@ -86,7 +109,9 @@ def create_lineup(
         side=body.side,
         pos_x=body.pos_x,
         pos_y=body.pos_y,
+        pos_z=body.pos_z,
         description=body.description,
+        tactics=tactics_data,
         created_by=current_user.id,
     )
     db.add(lineup)
@@ -118,6 +143,21 @@ def update_lineup(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid utility_type")
     if "side" in update_data and update_data["side"] not in ("ct", "t"):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid side")
+
+    if "tactics" in update_data:
+        tactics_list = update_data.pop("tactics")
+        if tactics_list is not None:
+            existing_ids = {t.get("tactic_id") for t in (lineup.tactics or [])}
+            serialized = []
+            for t in tactics_list:
+                d = t if isinstance(t, dict) else t.model_dump()
+                if d["tactic_id"] not in existing_ids:
+                    if not db.query(Tactic).filter(Tactic.id == d["tactic_id"]).first():
+                        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Tactic {d['tactic_id']} not found")
+                serialized.append(d)
+            update_data["tactics"] = serialized if serialized else None
+        else:
+            update_data["tactics"] = None
 
     for key, value in update_data.items():
         setattr(lineup, key, value)

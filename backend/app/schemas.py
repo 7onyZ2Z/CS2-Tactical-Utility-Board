@@ -51,7 +51,49 @@ class MapResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# --- Tactics ---
+
+
+class PositionData(BaseModel):
+    x: float
+    y: float
+    z: int = 0
+    duty: Optional[str] = None
+
+
+class TacticCreate(BaseModel):
+    name: str
+    category: str = "full_buy"
+    description: Optional[str] = None
+    positions: Optional[dict[str, Optional[PositionData]]] = None
+    map_id: int
+
+
+class TacticUpdate(BaseModel):
+    name: Optional[str] = None
+    category: Optional[str] = None
+    description: Optional[str] = None
+    positions: Optional[dict[str, Optional[PositionData]]] = None
+    map_id: Optional[int] = None
+
+
+class TacticResponse(BaseModel):
+    id: int
+    name: str
+    category: str = "full_buy"
+    description: Optional[str] = None
+    positions: Optional[dict[str, Optional[PositionData]]] = None
+    map_id: int
+
+    model_config = {"from_attributes": True}
+
+
 # --- Lineups ---
+
+
+class TacticAssignment(BaseModel):
+    tactic_id: int
+    executor: Optional[int] = None
 
 
 class LineupCreate(BaseModel):
@@ -61,7 +103,9 @@ class LineupCreate(BaseModel):
     side: str
     pos_x: Optional[float] = None
     pos_y: Optional[float] = None
+    pos_z: int = 0
     description: Optional[str] = None
+    tactics: Optional[list[TacticAssignment]] = None
 
 
 class LineupUpdate(BaseModel):
@@ -71,7 +115,9 @@ class LineupUpdate(BaseModel):
     side: Optional[str] = None
     pos_x: Optional[float] = None
     pos_y: Optional[float] = None
+    pos_z: Optional[int] = None
     description: Optional[str] = None
+    tactics: Optional[list[TacticAssignment]] = None
 
 
 class MediaResponse(BaseModel):
@@ -92,7 +138,9 @@ class LineupResponse(BaseModel):
     side: str
     pos_x: Optional[float] = None
     pos_y: Optional[float] = None
+    pos_z: int = 0
     description: Optional[str] = None
+    tactics: Optional[list[TacticAssignment]] = None
     created_by: int
     created_at: datetime
     updated_at: datetime

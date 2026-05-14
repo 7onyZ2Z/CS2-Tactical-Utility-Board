@@ -1,15 +1,18 @@
-import type { LineupResponse } from '../types';
-import { UTILITY_TYPES, SIDES } from './Sidebar';
+import type { LineupResponse, MapResponse } from '../types';
+import { UTILITY_TYPES, SIDES, MAP_ICONS } from './Sidebar';
 
 interface LineupCardProps {
   lineup: LineupResponse;
+  maps: MapResponse[];
   onClick: () => void;
 }
 
-export default function LineupCard({ lineup, onClick }: LineupCardProps) {
+export default function LineupCard({ lineup, maps, onClick }: LineupCardProps) {
   const utilityLabel = UTILITY_TYPES.find((u) => u.value === lineup.utility_type)?.label ?? lineup.utility_type;
   const sideLabel = SIDES.find((s) => s.value === lineup.side)?.label ?? lineup.side;
   const thumbnail = lineup.media.find((m) => m.file_type === 'image');
+  const mapInfo = maps.find((m) => m.id === lineup.map_id);
+  const mapIcon = mapInfo ? MAP_ICONS[mapInfo.name] : null;
 
   return (
     <div
@@ -52,8 +55,14 @@ export default function LineupCard({ lineup, onClick }: LineupCardProps) {
       </div>
       <div style={{ padding: '8px 12px' }}>
         <div style={{ color: '#e0e0e0', fontSize: 14, fontWeight: 'bold' }}>{lineup.name}</div>
-        <div style={{ color: '#8b949e', fontSize: 12, marginTop: 4 }}>
-          {sideLabel} | {utilityLabel}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+          <span style={{ color: '#8b949e', fontSize: 12 }}>{sideLabel} | {utilityLabel}</span>
+          {mapInfo && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              {mapIcon && <img src={mapIcon} alt="" style={{ width: 16, height: 16, objectFit: 'contain' }} />}
+              <span style={{ color: '#8b949e', fontSize: 11 }}>{mapInfo.display_name}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

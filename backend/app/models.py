@@ -8,6 +8,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    JSON,
 )
 from sqlalchemy.orm import relationship
 
@@ -35,6 +36,20 @@ class Map(Base):
     image_url = Column(String, nullable=True)
 
     lineups = relationship("Lineup", back_populates="map")
+    tactics = relationship("Tactic", back_populates="map")
+
+
+class Tactic(Base):
+    __tablename__ = "tactics"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    category = Column(String, nullable=False, default="full_buy")
+    description = Column(Text, nullable=True)
+    positions = Column(JSON, nullable=True)
+    map_id = Column(Integer, ForeignKey("maps.id"), nullable=False, index=True)
+
+    map = relationship("Map", back_populates="tactics")
 
 
 class Lineup(Base):
@@ -47,7 +62,9 @@ class Lineup(Base):
     side = Column(String, nullable=False)
     pos_x = Column(Float, nullable=True)
     pos_y = Column(Float, nullable=True)
+    pos_z = Column(Integer, nullable=False, default=0)
     description = Column(Text, nullable=True)
+    tactics = Column(JSON, nullable=True)
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(

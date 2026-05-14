@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .database import SessionLocal, engine
 from .models import Base
-from .routers import auth, lineups, maps, media, users
+from .routers import auth, lineups, maps, media, tactics, users
 from .seed import seed
 
 
@@ -37,6 +37,7 @@ app.include_router(auth.router)
 app.include_router(maps.router)
 app.include_router(lineups.router)
 app.include_router(media.router)
+app.include_router(tactics.router)
 app.include_router(users.router)
 
 if os.path.isdir("uploads"):
