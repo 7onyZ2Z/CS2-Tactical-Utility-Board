@@ -15,9 +15,9 @@ const MULTI_LEVEL_MAPS = new Set(['nuke', 'vertigo', 'train']);
 
 function getRadarUrl(mapName: string, z: number): string {
   if (MULTI_LEVEL_MAPS.has(mapName)) {
-    return z === 0 ? `/radar/de_${mapName}_upper.png` : `/radar/de_${mapName}_lower.png`;
+    return z === 0 ? `/radar/de_${mapName}_upper.webp` : `/radar/de_${mapName}_lower.webp`;
   }
-  return `/radar/de_${mapName}.png`;
+  return `/radar/de_${mapName}.webp`;
 }
 
 interface TacticDetailProps {
@@ -281,6 +281,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
             src={radarUrl}
             alt="radar"
             draggable={false}
+            loading="lazy"
             style={{ width: '100%', height: '100%', display: 'block' }}
           />
           {Object.entries(tactic.positions ?? {}).map(([key, pos]) => {

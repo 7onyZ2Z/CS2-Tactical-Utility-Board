@@ -3,15 +3,15 @@ import { listMaps } from '../api/maps';
 import type { MapResponse } from '../types';
 
 export const UTILITY_TYPES = [
-  { value: 'smoke', label: '烟雾弹', icon: '/utility_icon/smokegrenade.png' },
-  { value: 'flash', label: '闪光弹', icon: '/utility_icon/flashbang.png' },
-  { value: 'molotov', label: '燃烧瓶', icon: '/utility_icon/molotov.png' },
-  { value: 'he', label: '手雷', icon: '/utility_icon/hegrenade.png' },
+  { value: 'smoke', label: '烟雾弹', icon: '/utility_icon/smokegrenade.webp' },
+  { value: 'flash', label: '闪光弹', icon: '/utility_icon/flashbang.webp' },
+  { value: 'molotov', label: '燃烧瓶', icon: '/utility_icon/molotov.webp' },
+  { value: 'he', label: '手雷', icon: '/utility_icon/hegrenade.webp' },
 ] as const;
 
 export const SIDES = [
-  { value: 'ct', label: 'CT', icon: '/side_icon/ct.png' },
-  { value: 't', label: 'T', icon: '/side_icon/t.png' },
+  { value: 'ct', label: 'CT', icon: '/side_icon/ct.webp' },
+  { value: 't', label: 'T', icon: '/side_icon/t.webp' },
 ] as const;
 
 export const TACTIC_CATEGORIES = [
@@ -27,16 +27,16 @@ export const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export const MAP_ICONS: Record<string, string> = {
-  dust2: '/map_icon/de_dust2.png',
-  mirage: '/map_icon/de_mirage.png',
-  inferno: '/map_icon/de_inferno.png',
-  nuke: '/map_icon/de_nuke.png',
-  overpass: '/map_icon/de_overpass.png',
-  ancient: '/map_icon/de_ancient.png',
-  anubis: '/map_icon/de_anubis.png',
-  vertigo: '/map_icon/de_vertigo.png',
-  cache: '/map_icon/de_cache.png',
-  train: '/map_icon/de_train.png',
+  dust2: '/map_icon/de_dust2.webp',
+  mirage: '/map_icon/de_mirage.webp',
+  inferno: '/map_icon/de_inferno.webp',
+  nuke: '/map_icon/de_nuke.webp',
+  overpass: '/map_icon/de_overpass.webp',
+  ancient: '/map_icon/de_ancient.webp',
+  anubis: '/map_icon/de_anubis.webp',
+  vertigo: '/map_icon/de_vertigo.webp',
+  cache: '/map_icon/de_cache.webp',
+  train: '/map_icon/de_train.webp',
 };
 
 interface SidebarProps {

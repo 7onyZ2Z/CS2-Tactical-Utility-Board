@@ -11,10 +11,10 @@ const ZOOM_STEP = 0.1;
 function getRadarUrl(mapName: string, z: number): string {
   if (MULTI_LEVEL_MAPS.has(mapName)) {
     return z === 0
-      ? `/radar/de_${mapName}_upper.png`
-      : `/radar/de_${mapName}_lower.png`;
+      ? `/radar/de_${mapName}_upper.webp`
+      : `/radar/de_${mapName}_lower.webp`;
   }
-  return `/radar/de_${mapName}.png`;
+  return `/radar/de_${mapName}.webp`;
 }
 
 interface Props {
@@ -198,6 +198,7 @@ export default function RadarPicker({ open, map, onConfirm, onCancel }: Props) {
             src={radarUrl}
             alt="radar"
             draggable={false}
+            loading="lazy"
             style={{
               width: '100%',
               height: '100%',

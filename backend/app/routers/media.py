@@ -1,13 +1,15 @@
+import io
 import os
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from PIL import Image
 from sqlalchemy.orm import Session
 
 from ..config import settings
 from ..database import get_db
 from ..dependencies import get_current_user
-from ..models import Lineup, Media, User
+from ..models import Lineup, Map, Media, User
 
 router = APIRouter(prefix="/api", tags=["media"])
 
@@ -70,16 +72,26 @@ def upload_media(
             detail=f"File too large. Max {settings.MAX_IMAGE_SIZE_MB if file_type == 'image' else settings.MAX_VIDEO_SIZE_MB}MB",
         )
 
-    ext = content_type.split("/")[-1]
-    if ext == "jpeg":
-        ext = "jpg"
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    lineup_dir = os.path.join(settings.UPLOAD_DIR, str(lineup_id))
+    map_obj = db.query(Map).filter(Map.id == lineup.map_id).first()
+    map_name = map_obj.name if map_obj else "unknown"
+    lineup_dir = os.path.join(settings.UPLOAD_DIR, "utility", map_name, lineup.utility_type)
     os.makedirs(lineup_dir, exist_ok=True)
-    filepath = os.path.join(lineup_dir, filename)
 
-    with open(filepath, "wb") as f:
-        f.write(contents)
+    if file_type == "image":
+        img = Image.open(io.BytesIO(contents))
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+        filename = f"{uuid.uuid4().hex}.webp"
+        filepath = os.path.join(lineup_dir, filename)
+        img.save(filepath, "WEBP", quality=85, method=6)
+    else:
+        ext = content_type.split("/")[-1]
+        if ext == "jpeg":
+            ext = "jpg"
+        filename = f"{uuid.uuid4().hex}.{ext}"
+        filepath = os.path.join(lineup_dir, filename)
+        with open(filepath, "wb") as f:
+            f.write(contents)
 
     max_order = (
         db.query(Media)

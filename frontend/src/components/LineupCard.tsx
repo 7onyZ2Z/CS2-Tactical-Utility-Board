@@ -47,6 +47,7 @@ export default function LineupCard({ lineup, maps, onClick }: LineupCardProps) {
           <img
             src={`/${thumbnail.file_path}`}
             alt={lineup.name}
+            loading="lazy"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (

@@ -12,16 +12,16 @@ const MULTI_LEVEL_MAPS = new Set(['nuke', 'vertigo', 'train']);
 
 function getRadarUrl(mapName: string, z: number): string {
   if (MULTI_LEVEL_MAPS.has(mapName)) {
-    return z === 0 ? `/radar/de_${mapName}_upper.png` : `/radar/de_${mapName}_lower.png`;
+    return z === 0 ? `/radar/de_${mapName}_upper.webp` : `/radar/de_${mapName}_lower.webp`;
   }
-  return `/radar/de_${mapName}.png`;
+  return `/radar/de_${mapName}.webp`;
 }
 
 const UTILITY_ICONS: Record<string, string> = {
-  smoke: '/utility_icon2/Smoke.png',
-  flash: '/utility_icon2/Flashbang.png',
-  molotov: '/utility_icon2/Molly.png',
-  he: '/utility_icon2/Hegrenade.png',
+  smoke: '/utility_icon2/Smoke.webp',
+  flash: '/utility_icon2/Flashbang.webp',
+  molotov: '/utility_icon2/Molly.webp',
+  he: '/utility_icon2/Hegrenade.webp',
 };
 
 interface LineupDetailProps {
@@ -294,6 +294,7 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
               src={radarUrl}
               alt="radar"
               draggable={false}
+              loading="lazy"
               style={{ width: '100%', height: '100%', display: 'block' }}
             />
             {utilityIcon && (
