@@ -135,34 +135,39 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
 
   return (
     <div>
+      <div
+        onClick={onBack}
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 20,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          color: '#22c55e',
+          cursor: 'pointer',
+          fontSize: 14,
+          background: 'rgba(110,118,129,0.5)',
+          padding: '6px 12px',
+          borderRadius: 6,
+          marginBottom: 12,
+        }}
+      >
+        <ArrowLeftOutlined />
+        返回列表
+      </div>
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <div
-          onClick={onBack}
-          style={{
-            color: '#4ade80',
-            cursor: 'pointer',
-            fontSize: 14,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <ArrowLeftOutlined />
-          返回列表
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <h2 style={{ color: '#e0e0e0', margin: 0 }}>{lineup.name}</h2>
+          <Tag color="green">{sideLabel}</Tag>
+          <Tag>{utilityLabel}</Tag>
         </div>
         {canEdit && (
           <Button icon={<EditOutlined />} onClick={() => setEditOpen(true)}>
             编辑点位
           </Button>
         )}
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h2 style={{ color: '#e0e0e0', margin: 0 }}>{lineup.name}</h2>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Tag color="green">{sideLabel}</Tag>
-          <Tag>{utilityLabel}</Tag>
-        </div>
       </div>
 
       {lineup.description && (
