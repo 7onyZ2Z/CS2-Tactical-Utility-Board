@@ -2,7 +2,7 @@
 FROM node:20-alpine AS frontend-build
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm ci
+RUN npm config set registry https://mirrors.tuna.tsinghua.edu.cn/npm/ && npm ci
 COPY frontend/ ./
 RUN npm run build
 
@@ -11,7 +11,7 @@ FROM python:3.13-slim
 WORKDIR /app
 
 COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple -r requirements.txt
 
 COPY backend/app ./app
 COPY --from=frontend-build /app/frontend/dist ./frontend/dist
