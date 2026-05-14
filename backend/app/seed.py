@@ -18,13 +18,17 @@ MAPS = [
 
 
 def seed(db: Session):
-    if not db.query(User).filter(User.username == "admin").first():
-        admin = User(
-            username="admin",
-            hashed_password=hash_password("admin123"),
-            role="admin",
-        )
-        db.add(admin)
+    users = [
+        ("admin", "admin123", "admin"),
+        ("igl", "cqucs2", "author"),
+        ("entry", "cqucs2", "author"),
+        ("awper", "cqucs2", "author"),
+        ("lurker", "cqucs2", "author"),
+        ("support", "cqucs2", "author"),
+    ]
+    for username, password, role in users:
+        if not db.query(User).filter(User.username == username).first():
+            db.add(User(username=username, hashed_password=hash_password(password), role=role))
 
     for name, display_name, image_file in MAPS:
         existing = db.query(Map).filter(Map.name == name).first()
