@@ -115,7 +115,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 首次启动会自动：
 - 创建 SQLite 数据库
-- 创建管理员账号 `admin` / `admin123`
+- 创建管理员账号`admin` / `admin123`和5 个作者权限用户: `igl`、`entry`、`awper`、`lurker`、`support`，密码均为 `cqucs2`
 - 插入 10 张 CS2 竞技地图数据
 
 ### 2. 前端
@@ -230,8 +230,64 @@ server {
 | 变量 | 说明 | 默认值 |
 |------|------|--------|
 | SECRET_KEY | JWT 签名密钥 | change-me-to-a-random-string-in-production |
-| DATABASE_URL | 数据库连接字符串 | sqlite:///./utility_lookup.db |
+| DATABASE_URL | 数据库连接字符串 | sqlite:///./data/utility_lookup.db |
 | ACCESS_TOKEN_EXPIRE_MINUTES | Token 过期时间（分钟） | 1440（24 小时） |
+
+## Docker 部署（推荐）
+
+使用 Docker Compose 一键部署，后端自动托管前端静态文件。
+
+### 1. 配置环境变量
+
+```bash
+# 复制环境变量模板并修改 SECRET_KEY
+cp backend/.env.docker backend/.env
+# 编辑 backend/.env，将 SECRET_KEY 改为随机字符串
+```
+
+### 2. 构建并启动
+
+```bash
+# 构建镜像并启动（首次较慢，需要构建前端）
+docker compose up -d --build
+
+# 查看日志
+docker compose logs -f
+```
+
+### 3. 访问应用
+
+浏览器打开 `http://your-server-ip:8000`
+
+默认账号：`admin` / `admin123`
+
+### 4. 常用命令
+
+```bash
+# 停止
+docker compose down
+
+# 重新构建（代码更新后）
+docker compose up -d --build
+
+# 查看状态
+docker compose ps
+
+# 数据备份（数据库和上传文件在 Docker volumes 中）
+docker run --rm -v utility_lookup_app-data:/data -v $(pwd):/backup alpine tar czf /backup/data-backup.tar.gz -C /data .
+```
+
+### 架构说明
+
+```
+Docker Container (port 8000)
+├── Uvicorn (FastAPI)
+│   ├── /api/*        → 后端 API
+│   ├── /uploads/*    → 上传的媒体文件
+│   └── /*            → 前端 SPA (React)
+├── /app/data/        → SQLite 数据库 (volume)
+└── /app/uploads/     → 媒体文件 (volume)
+```
 
 ## 测试
 

@@ -1,0 +1,16 @@
+.git
+.gitignore
+.DS_Store
+.superpowers
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/node_modules
+frontend/dist
+backend/uploads
+backend/*.db
+backend/apifox-import.json
+backend/openapi.json
+frontend/source_img
+docs
+*.md

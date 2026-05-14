@@ -6,3 +6,5 @@ uploads/
 .pytest_cache/
 .venv/
 venv/
+.superpowers/
+docs/
