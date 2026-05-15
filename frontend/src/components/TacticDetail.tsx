@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button, Modal, Form, Input, Select, Upload, message, Tabs, Checkbox } from 'antd';
 import { ArrowLeftOutlined, PlusOutlined, UploadOutlined, AimOutlined, DeleteOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd';
-import type { TacticResponse, MapResponse, LineupResponse, TacticAssignment } from '../types';
+import type { TacticResponse, MapResponse, LineupResponse, TacticAssignment, PositionData } from '../types';
 import { listLineups, createLineup, updateLineup, uploadMedia } from '../api/lineups';
 import { listMaps } from '../api/maps';
 import { deleteTactic, updateTactic } from '../api/tactics';
