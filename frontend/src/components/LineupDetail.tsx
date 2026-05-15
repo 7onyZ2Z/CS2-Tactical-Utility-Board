@@ -144,7 +144,7 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
           display: 'inline-flex',
           alignItems: 'center',
           gap: 6,
-          color: '#22c55e',
+          color: '#d4a853',
           cursor: 'pointer',
           fontSize: 14,
           background: 'rgba(110,118,129,0.5)',
@@ -159,8 +159,8 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <h2 style={{ color: '#e0e0e0', margin: 0 }}>{lineup.name}</h2>
-          <Tag color="green">{sideLabel}</Tag>
+          <h2 style={{ color: '#f5ead6', margin: 0 }}>{lineup.name}</h2>
+          <Tag color="gold">{sideLabel}</Tag>
           <Tag>{utilityLabel}</Tag>
         </div>
         {canEdit && (
@@ -172,12 +172,12 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
 
       {lineup.description && (
         <div className="anim-slide-in-left" style={{
-          color: '#c9d1d9',
+          color: '#f5ead6',
           fontSize: 14,
           lineHeight: 1.6,
           marginBottom: 16,
-          background: '#161b22',
-          border: '1px solid #21262d',
+          background: '#221d18',
+          border: '1px solid #3d3628',
           borderRadius: 8,
           padding: 16,
         }}>
@@ -186,8 +186,8 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
       )}
 
       <div style={{
-        background: '#161b22',
-        border: '1px solid #21262d',
+        background: '#221d18',
+        border: '1px solid #3d3628',
         borderRadius: 8,
         overflow: 'hidden',
         marginBottom: 16,
@@ -206,7 +206,7 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
                 <div key={m.id}>
                   <div style={{
                     aspectRatio: '16/9',
-                    background: '#21262d',
+                    background: '#3d3628',
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -252,7 +252,7 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
                         width: 8,
                         height: 8,
                         borderRadius: '50%',
-                        background: i === imgIndex ? '#4ade80' : 'rgba(255,255,255,0.4)',
+                        background: i === imgIndex ? '#d4a853' : 'rgba(255,255,255,0.4)',
                         transition: 'background 0.2s',
                         cursor: 'pointer',
                       }}
@@ -273,7 +273,7 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
         )}
 
         {images.length === 0 && !video && (
-          <div style={{ padding: 40, textAlign: 'center', color: '#8b949e' }}>
+          <div style={{ padding: 40, textAlign: 'center', color: '#b8956a' }}>
             暂无媒体文件
           </div>
         )}
@@ -290,8 +290,8 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
             position: 'relative',
             aspectRatio: '1',
             height: 'min(600px, calc(100vh - 300px))',
-            background: '#161b22',
-            border: '1px solid #21262d',
+            background: '#221d18',
+            border: '1px solid #3d3628',
             borderRadius: 8,
             overflow: 'hidden',
           }}>
@@ -326,7 +326,7 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', gap: 8 }}>
           {lineup.pos_x != null && lineup.pos_y != null && (
-            <span style={{ color: '#8b949e', fontSize: 12, background: '#21262d', padding: '4px 8px', borderRadius: 4 }}>
+            <span style={{ color: '#b8956a', fontSize: 12, background: '#3d3628', padding: '4px 8px', borderRadius: 4 }}>
               坐标: ({lineup.pos_x}, {lineup.pos_y})
             </span>
           )}
@@ -398,7 +398,7 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
                       ? `(${editForm.getFieldValue('pos_x')}, ${editForm.getFieldValue('pos_y')}) — 重新选择`
                       : '选择爆点'}
                   </Button>
-                  {!selectedMap && <span style={{ color: '#8b949e', fontSize: 12 }}>请先选择地图</span>}
+                  {!selectedMap && <span style={{ color: '#b8956a', fontSize: 12 }}>请先选择地图</span>}
                 </div>
                 <Form.Item name="pos_x" hidden><Input /></Form.Item>
                 <Form.Item name="pos_y" hidden><Input /></Form.Item>

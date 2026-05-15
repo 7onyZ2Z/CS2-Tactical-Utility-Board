@@ -18,8 +18,8 @@ export default function LineupCard({ lineup, maps, onClick }: LineupCardProps) {
     <div
       onClick={onClick}
       style={{
-        background: '#161b22',
-        border: '1px solid #21262d',
+        background: '#221d18',
+        border: '1px solid #3d3628',
         borderRadius: 8,
         overflow: 'hidden',
         cursor: 'pointer',
@@ -27,17 +27,17 @@ export default function LineupCard({ lineup, maps, onClick }: LineupCardProps) {
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.borderColor = '#4ade80';
+        e.currentTarget.style.borderColor = '#d4a853';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.borderColor = '#21262d';
+        e.currentTarget.style.borderColor = '#3d3628';
       }}
     >
       <div style={{
         width: '100%',
         height: 120,
-        background: '#21262d',
+        background: '#3d3628',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -51,17 +51,17 @@ export default function LineupCard({ lineup, maps, onClick }: LineupCardProps) {
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
-          <span style={{ color: '#4ade80', fontSize: 12 }}>暂无图片</span>
+          <span style={{ color: '#d4a853', fontSize: 12 }}>暂无图片</span>
         )}
       </div>
       <div style={{ padding: '8px 12px' }}>
-        <div style={{ color: '#e0e0e0', fontSize: 14, fontWeight: 'bold' }}>{lineup.name}</div>
+        <div style={{ color: '#f5ead6', fontSize: 14, fontWeight: 'bold' }}>{lineup.name}</div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-          <span style={{ color: '#8b949e', fontSize: 12 }}>{sideLabel} | {utilityLabel}</span>
+          <span style={{ color: '#b8956a', fontSize: 12 }}>{sideLabel} | {utilityLabel}</span>
           {mapInfo && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               {mapIcon && <img src={mapIcon} alt="" style={{ width: 16, height: 16, objectFit: 'contain' }} />}
-              <span style={{ color: '#8b949e', fontSize: 11 }}>{mapInfo.display_name}</span>
+              <span style={{ color: '#b8956a', fontSize: 11 }}>{mapInfo.display_name}</span>
             </div>
           )}
         </div>

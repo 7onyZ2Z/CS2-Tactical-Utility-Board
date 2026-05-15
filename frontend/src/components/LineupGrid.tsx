@@ -80,7 +80,7 @@ export default function LineupGrid({ lineups, total, page, pageSize, loading, ke
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, gap: 12, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ color: '#c9d1d9', fontSize: 14, whiteSpace: 'nowrap' }}>找到 {total} 个点位</span>
+          <span style={{ color: '#f5ead6', fontSize: 14, whiteSpace: 'nowrap' }}>找到 {total} 个点位</span>
           <Input.Search
             placeholder="搜索道具名称..."
             allowClear
@@ -140,7 +140,7 @@ export default function LineupGrid({ lineups, total, page, pageSize, loading, ke
             </div>
           )}
           {lineups.length === 0 && (
-            <div style={{ textAlign: 'center', color: '#8b949e', padding: 80 }}>
+            <div style={{ textAlign: 'center', color: '#b8956a', padding: 80 }}>
               暂无匹配的道具点位
             </div>
           )}
@@ -206,7 +206,7 @@ export default function LineupGrid({ lineups, total, page, pageSize, loading, ke
                       ? `(${form.getFieldValue('pos_x')}, ${form.getFieldValue('pos_y')}) — 重新选择`
                       : '选择爆点'}
                   </Button>
-                  {!selectedMap && <span style={{ color: '#8b949e', fontSize: 12 }}>请先选择地图</span>}
+                  {!selectedMap && <span style={{ color: '#b8956a', fontSize: 12 }}>请先选择地图</span>}
                 </div>
                 <Form.Item name="pos_x" hidden><Input /></Form.Item>
                 <Form.Item name="pos_y" hidden><Input /></Form.Item>
@@ -225,7 +225,7 @@ export default function LineupGrid({ lineups, total, page, pageSize, loading, ke
                   multiple
                 >
                   {fileList.length < 5 && (
-                    <div style={{ color: '#8b949e' }}>
+                    <div style={{ color: '#b8956a' }}>
                       <UploadOutlined />
                       <div style={{ fontSize: 12, marginTop: 4 }}>上传图片</div>
                     </div>

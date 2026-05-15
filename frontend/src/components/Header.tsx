@@ -17,13 +17,13 @@ export default function Header({ user, view, onViewChange, onLogout }: HeaderPro
       alignItems: 'center',
       padding: '0 20px',
       height: 48,
-      background: '#161b22',
-      borderBottom: '1px solid #21262d',
+      background: '#221d18',
+      borderBottom: '1px solid #3d3628',
     }}>
       <span
         onClick={() => onViewChange(view === 'tactics' ? 'lineups' : 'tactics')}
         style={{
-          color: '#4ade80',
+          color: '#d4a853',
           fontSize: 18,
           fontWeight: 'bold',
           letterSpacing: 2,
@@ -38,10 +38,10 @@ export default function Header({ user, view, onViewChange, onLogout }: HeaderPro
         <SwapOutlined style={{ fontSize: 12, opacity: 0.5 }} />
       </span>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <span style={{ color: '#8b949e', fontSize: 14 }}>{user.username}</span>
+        <span style={{ color: '#b8956a', fontSize: 14 }}>{user.username}</span>
         <Popconfirm title="确认登出？" onConfirm={onLogout} okText="确认" cancelText="取消">
           <span style={{
-            color: '#8b949e',
+            color: '#b8956a',
             fontSize: 13,
             cursor: 'pointer',
             display: 'flex',

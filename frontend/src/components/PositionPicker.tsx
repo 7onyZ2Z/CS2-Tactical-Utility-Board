@@ -3,7 +3,7 @@ import { Modal, Button, Input } from 'antd';
 import type { MapResponse, PositionData } from '../types';
 
 const MULTI_LEVEL_MAPS = new Set(['nuke', 'vertigo', 'train']);
-const POS_COLORS = ['#4ade80', '#60a5fa', '#f59e0b', '#f472b6', '#a78bfa'];
+const POS_COLORS = ['#d4a853', '#f0a060', '#e8c840', '#e07060', '#c4a0e0'];
 
 function getRadarUrl(mapName: string, z: number): string {
   if (MULTI_LEVEL_MAPS.has(mapName)) {
@@ -109,7 +109,7 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
             <Button size="small" type={z === 1 ? 'primary' : 'default'} onClick={() => { setZ(1); setPositions({}); }}>下层</Button>
           </div>
         )}
-        <span style={{ color: '#8b949e', fontSize: 13 }}>拖动右侧数字到雷达图上分配位置</span>
+        <span style={{ color: '#b8956a', fontSize: 13 }}>拖动右侧数字到雷达图上分配位置</span>
       </div>
       <div style={{ display: 'flex' }}>
         <div
@@ -119,7 +119,7 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
             width: 'min(calc(100vw - 200px), calc(100vh - 260px))',
             height: 'min(calc(100vw - 200px), calc(100vh - 260px))',
             position: 'relative',
-            background: '#0d1117',
+            background: '#1a1612',
             userSelect: 'none',
           }}
         >
@@ -169,8 +169,8 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
           flexDirection: 'column',
           gap: 8,
           padding: '8px 10px',
-          background: '#161b22',
-          borderLeft: '1px solid #21262d',
+          background: '#221d18',
+          borderLeft: '1px solid #3d3628',
         }}>
           {[1, 2, 3, 4, 5].map((num) => {
             const placed = !!positions[num];
@@ -182,8 +182,8 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
                     width: 20,
                     height: 20,
                     borderRadius: '50%',
-                    background: placed ? '#30363d' : POS_COLORS[num - 1],
-                    color: placed ? '#8b949e' : '#fff',
+                    background: placed ? '#4a3d2e' : POS_COLORS[num - 1],
+                    color: placed ? '#b8956a' : '#fff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -207,9 +207,9 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
                   style={{
                     width: 0,
                     flex: 1,
-                    background: '#0d1117',
-                    borderColor: '#30363d',
-                    color: '#c9d1d9',
+                    background: '#1a1612',
+                    borderColor: '#4a3d2e',
+                    color: '#f5ead6',
                     fontSize: 11,
                   }}
                 />

@@ -86,7 +86,7 @@ export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticG
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, gap: 12, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ color: '#c9d1d9', fontSize: 14, whiteSpace: 'nowrap' }}>找到 {total} 个战术</span>
+          <span style={{ color: '#f5ead6', fontSize: 14, whiteSpace: 'nowrap' }}>找到 {total} 个战术</span>
           <Input.Search
             placeholder="搜索战术名称..."
             allowClear
@@ -139,29 +139,29 @@ export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticG
                   style={{
                     animationDelay: `${i * 50}ms`,
                     cursor: 'pointer',
-                    background: '#161b22',
-                    border: '1px solid #21262d',
+                    background: '#221d18',
+                    border: '1px solid #3d3628',
                     borderRadius: 8,
                     padding: 16,
                     transition: 'all 0.2s',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.borderColor = '#4ade80';
+                    e.currentTarget.style.borderColor = '#d4a853';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.borderColor = '#21262d';
+                    e.currentTarget.style.borderColor = '#3d3628';
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ color: '#e0e0e0', fontSize: 16, fontWeight: 'bold' }}>{t.name}</span>
+                        <span style={{ color: '#f5ead6', fontSize: 16, fontWeight: 'bold' }}>{t.name}</span>
                         <span style={{
-                          color: CATEGORY_COLORS[t.category] ?? '#8b949e',
+                          color: CATEGORY_COLORS[t.category] ?? '#b8956a',
                           fontSize: 11,
-                          background: `${CATEGORY_COLORS[t.category] ?? '#8b949e'}20`,
+                          background: `${CATEGORY_COLORS[t.category] ?? '#b8956a'}20`,
                           padding: '1px 6px',
                           borderRadius: 4,
                           fontWeight: 'bold',
@@ -172,7 +172,7 @@ export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticG
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
                       {icon && <img src={icon} alt="" style={{ width: 24, height: 24, objectFit: 'contain' }} />}
-                      <span style={{ color: '#8b949e', fontSize: 12 }}>{getMapName(t.map_id)}</span>
+                      <span style={{ color: '#b8956a', fontSize: 12 }}>{getMapName(t.map_id)}</span>
                     </div>
                   </div>
                 </div>
@@ -193,7 +193,7 @@ export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticG
           )}
 
           {tactics.length === 0 && (
-            <div style={{ textAlign: 'center', color: '#8b949e', padding: 80 }}>
+            <div style={{ textAlign: 'center', color: '#b8956a', padding: 80 }}>
               暂无战术，点击右上角创建
             </div>
           )}
@@ -246,7 +246,7 @@ export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticG
               >
                 {positions ? '已分配 — 重新选择' : '分配位置'}
               </Button>
-              {!selectedMapForPos && <span style={{ color: '#8b949e', fontSize: 12 }}>请先选择地图</span>}
+              {!selectedMapForPos && <span style={{ color: '#b8956a', fontSize: 12 }}>请先选择地图</span>}
             </div>
           </Form.Item>
         </Form>

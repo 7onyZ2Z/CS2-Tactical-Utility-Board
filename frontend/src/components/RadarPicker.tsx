@@ -163,13 +163,13 @@ export default function RadarPicker({ open, map, onConfirm, onCancel }: Props) {
           <Button size="small" icon={<ZoomInOutlined />} disabled={zoom >= ZOOM_MAX} onClick={() => setZoom((v) => Math.min(ZOOM_MAX, v + ZOOM_STEP))} />
         </div>
         {marker && (
-          <span style={{ color: '#8b949e', fontSize: 13 }}>
+          <span style={{ color: '#b8956a', fontSize: 13 }}>
             <AimOutlined style={{ marginRight: 4 }} />
             ({marker.x.toFixed(1)}, {marker.y.toFixed(1)}) {isMultiLevel ? (z === 0 ? '上层' : '下层') : ''}
           </span>
         )}
         {!marker && (
-          <span style={{ color: '#8b949e', fontSize: 13 }}>左键选择爆点 · 滚轮缩放 · 右键拖动</span>
+          <span style={{ color: '#b8956a', fontSize: 13 }}>左键选择爆点 · 滚轮缩放 · 右键拖动</span>
         )}
       </div>
       <div
@@ -185,7 +185,7 @@ export default function RadarPicker({ open, map, onConfirm, onCancel }: Props) {
           height: 'min(calc(100vw - 80px), calc(100vh - 260px))',
           cursor: panning ? 'grabbing' : 'crosshair',
           overflow: 'auto',
-          background: '#0d1117',
+          background: '#1a1612',
           userSelect: 'none',
         }}
       >
@@ -215,9 +215,9 @@ export default function RadarPicker({ open, map, onConfirm, onCancel }: Props) {
                 width: Math.max(16 / zoom, 8),
                 height: Math.max(16 / zoom, 8),
                 borderRadius: '50%',
-                background: '#4ade80',
+                background: '#d4a853',
                 border: '2px solid #fff',
-                boxShadow: '0 0 8px rgba(74,222,128,0.6)',
+                boxShadow: '0 0 8px rgba(212,168,83,0.6)',
                 pointerEvents: 'none',
               }}
             />

@@ -11,7 +11,7 @@ import LineupCard from './LineupCard';
 import RadarPicker from './RadarPicker';
 import PositionPicker from './PositionPicker';
 
-const POS_COLORS = ['#4ade80', '#60a5fa', '#f59e0b', '#f472b6', '#a78bfa'];
+const POS_COLORS = ['#d4a853', '#f0a060', '#e8c840', '#e07060', '#c4a0e0'];
 const MULTI_LEVEL_MAPS = new Set(['nuke', 'vertigo', 'train']);
 
 function getRadarUrl(mapName: string, z: number): string {
@@ -211,25 +211,25 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
         position: 'relative', zIndex: 20, flexShrink: 0,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '12px 16px',
-        background: '#0d1117ee',
-        borderBottom: '1px solid #21262d',
+        background: '#1a1612ee',
+        borderBottom: '1px solid #3d3628',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span
             onClick={onBack}
-            style={{ color: '#4ade80', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}
+            style={{ color: '#d4a853', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}
           >
             <ArrowLeftOutlined />
             返回
           </span>
           {mapIcon && <img src={mapIcon} alt="" style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 4 }} />}
           <div>
-            <h2 style={{ color: '#e0e0e0', margin: 0, fontSize: 16 }}>{tactic.name}</h2>
+            <h2 style={{ color: '#f5ead6', margin: 0, fontSize: 16 }}>{tactic.name}</h2>
           </div>
           <span style={{
-            color: CATEGORY_COLORS[tactic.category] ?? '#8b949e',
+            color: CATEGORY_COLORS[tactic.category] ?? '#b8956a',
             fontSize: 11,
-            background: `${CATEGORY_COLORS[tactic.category] ?? '#8b949e'}20`,
+            background: `${CATEGORY_COLORS[tactic.category] ?? '#b8956a'}20`,
             padding: '1px 6px',
             borderRadius: 4,
             fontWeight: 'bold',
@@ -300,7 +300,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
       {/* Radar Map + Description */}
       <div
         onClick={() => setActivePosition(null)}
-        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0d1117', overflow: 'hidden', position: 'relative' }}
+        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1a1612', overflow: 'hidden', position: 'relative' }}
       >
         {tactic.description && (
           <div className="anim-slide-in-left" style={{
@@ -309,7 +309,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
             left: 20,
             maxWidth: 200,
             zIndex: 15,
-            color: '#c9d1d9',
+            color: '#f5ead6',
             fontSize: 21,
             lineHeight: 1.5,
           }}>
@@ -378,9 +378,9 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
           left: 16,
           right: 16,
           zIndex: 20,
-          background: '#161b22ee',
+          background: '#221d18ee',
           borderRadius: 8,
-          border: '1px solid #21262d',
+          border: '1px solid #3d3628',
           padding: 12,
           maxHeight: 200,
           overflowY: 'auto',
@@ -395,7 +395,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
               height: 22,
               borderRadius: '50%',
               background: 'rgba(110,118,129,0.4)',
-              color: '#c9d1d9',
+              color: '#f5ead6',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -453,7 +453,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
             </div>
           )}
           {filteredLineups.length === 0 && !tactic.positions?.[String(activePosition)]?.duty && (
-            <div style={{ textAlign: 'center', color: '#8b949e', padding: 8 }}>
+            <div style={{ textAlign: 'center', color: '#b8956a', padding: 8 }}>
               该位置暂无道具点位
             </div>
           )}
@@ -491,7 +491,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
               >
                 {editPositions ? '已分配 — 重新选择' : '分配位置'}
               </Button>
-              {!mapInfo && <span style={{ color: '#8b949e', fontSize: 12 }}>地图信息不可用</span>}
+              {!mapInfo && <span style={{ color: '#b8956a', fontSize: 12 }}>地图信息不可用</span>}
             </div>
           </Form.Item>
           <Form.Item name="description" label="描述">
@@ -536,7 +536,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
                     {mapLineups.filter((l) =>
                       !searchKeyword || l.name.toLowerCase().includes(searchKeyword.toLowerCase())
                     ).length === 0 && (
-                      <div style={{ textAlign: 'center', color: '#8b949e', padding: 40 }}>
+                      <div style={{ textAlign: 'center', color: '#b8956a', padding: 40 }}>
                         {searchKeyword ? '无匹配道具' : '该地图暂无可用道具'}
                       </div>
                     )}
@@ -553,8 +553,8 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
                             alignItems: 'center',
                             gap: 12,
                             padding: '8px 12px',
-                            background: checked ? '#1a2e1a' : '#161b22',
-                            border: `1px solid ${checked ? '#4ade8040' : '#21262d'}`,
+                            background: checked ? '#1a2e1a' : '#221d18',
+                            border: `1px solid ${checked ? '#d4a85340' : '#3d3628'}`,
                             borderRadius: 6,
                             marginBottom: 8,
                           }}
@@ -580,8 +580,8 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
                             }}
                           />
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ color: '#e0e0e0', fontSize: 14, fontWeight: 'bold' }}>{l.name}</div>
-                            <div style={{ color: '#8b949e', fontSize: 12 }}>
+                            <div style={{ color: '#f5ead6', fontSize: 14, fontWeight: 'bold' }}>{l.name}</div>
+                            <div style={{ color: '#b8956a', fontSize: 12 }}>
                               {SIDES.find((s) => s.value === l.side)?.label} · {utilityLabel}
                             </div>
                           </div>
@@ -670,7 +670,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
                               ? `(${form.getFieldValue('pos_x')}, ${form.getFieldValue('pos_y')}) — 重新选择`
                               : '选择爆点'}
                           </Button>
-                          {!selectedMap && <span style={{ color: '#8b949e', fontSize: 12 }}>请先选择地图</span>}
+                          {!selectedMap && <span style={{ color: '#b8956a', fontSize: 12 }}>请先选择地图</span>}
                         </div>
                         <Form.Item name="pos_x" hidden><Input /></Form.Item>
                         <Form.Item name="pos_y" hidden><Input /></Form.Item>
@@ -689,7 +689,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
                           multiple
                         >
                           {fileList.length < 5 && (
-                            <div style={{ color: '#8b949e' }}>
+                            <div style={{ color: '#b8956a' }}>
                               <UploadOutlined />
                               <div style={{ fontSize: 12, marginTop: 4 }}>上传图片</div>
                             </div>

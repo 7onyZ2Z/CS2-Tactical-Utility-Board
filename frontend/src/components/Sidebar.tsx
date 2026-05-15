@@ -23,7 +23,7 @@ export const TACTIC_CATEGORIES = [
 export const CATEGORY_COLORS: Record<string, string> = {
   eco: '#f59e0b',
   force_buy: '#f97316',
-  full_buy: '#3b82f6',
+  full_buy: '#689d6a',
 };
 
 export const MAP_ICONS: Record<string, string> = {
@@ -71,10 +71,10 @@ export default function Sidebar({
     textAlign: 'center' as const,
     cursor: 'pointer',
     transition: 'all 0.2s',
-    background: active ? '#4ade80' : '#21262d',
-    color: active ? '#0d1117' : '#c9d1d9',
+    background: active ? '#d4a853' : '#3d3628',
+    color: active ? '#1a1612' : '#f5ead6',
     fontWeight: active ? 'bold' : 'normal',
-    border: active ? '1px solid #4ade80' : '1px solid #30363d',
+    border: active ? '1px solid #d4a853' : '1px solid #4a3d2e',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -82,7 +82,7 @@ export default function Sidebar({
   });
 
   const sectionLabel: React.CSSProperties = {
-    color: '#8b949e',
+    color: '#b8956a',
     fontSize: 11,
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -92,15 +92,15 @@ export default function Sidebar({
   return (
     <>
       <style>{`
-        .sb-btn:hover { border-color: #4ade80 !important; }
+        .sb-btn:hover { border-color: #d4a853 !important; }
       `}</style>
       <div style={{
         width: view === 'tactics' ? 76 : '25vw',
         minWidth: view === 'tactics' ? 76 : 240,
         maxWidth: view === 'tactics' ? 76 : 320,
         flexShrink: 0,
-        background: '#161b22',
-        borderRight: '1px solid #21262d',
+        background: '#221d18',
+        borderRight: '1px solid #3d3628',
         padding: view === 'tactics' ? 8 : 16,
         overflowY: 'auto',
         display: 'flex',

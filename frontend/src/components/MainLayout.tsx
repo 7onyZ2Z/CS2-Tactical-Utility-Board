@@ -162,7 +162,7 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0d1117' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#1a1612' }}>
       <Header user={user} view={view} onViewChange={handleViewChange} onLogout={onLogout} />
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         <Sidebar
