@@ -15,13 +15,15 @@ interface LineupGridProps {
   page: number;
   pageSize: number;
   loading: boolean;
+  keyword: string;
+  onKeywordChange: (value: string) => void;
   onSelect: (id: number) => void;
   canCreate: boolean;
   onCreated: () => void;
   onPageChange: (page: number, pageSize: number) => void;
 }
 
-export default function LineupGrid({ lineups, total, page, pageSize, loading, onSelect, canCreate, onCreated, onPageChange }: LineupGridProps) {
+export default function LineupGrid({ lineups, total, page, pageSize, loading, keyword, onKeywordChange, onSelect, canCreate, onCreated, onPageChange }: LineupGridProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [maps, setMaps] = useState<MapResponse[]>([]);
@@ -71,50 +73,60 @@ export default function LineupGrid({ lineups, total, page, pageSize, loading, on
     setSelectedMap(null);
   };
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
-        <Spin size="large" />
-      </div>
-    );
-  }
-
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <span style={{ color: '#c9d1d9', fontSize: 14 }}>找到 {total} 个点位</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ color: '#c9d1d9', fontSize: 14, whiteSpace: 'nowrap' }}>找到 {total} 个点位</span>
+          <Input.Search
+            placeholder="搜索道具名称..."
+            allowClear
+            value={keyword}
+            onChange={(e) => onKeywordChange(e.target.value)}
+            style={{ width: 220 }}
+            size="small"
+          />
+        </div>
         {canCreate && (
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
             新增点位
           </Button>
         )}
       </div>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-        gap: 16,
-      }}>
-        {lineups.map((lineup, i) => (
-          <div key={lineup.id} className="anim-fade-in-up" style={{ animationDelay: `${i * 40}ms` }}>
-            <LineupCard lineup={lineup} maps={maps} onClick={() => onSelect(lineup.id)} />
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
+          <Spin size="large" />
+        </div>
+      ) : (
+        <>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gap: 16,
+          }}>
+            {lineups.map((lineup, i) => (
+              <div key={lineup.id} className="anim-fade-in-up" style={{ animationDelay: `${i * 40}ms` }}>
+                <LineupCard lineup={lineup} maps={maps} onClick={() => onSelect(lineup.id)} />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      {total > pageSize && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
-          <Pagination
-            current={page}
-            pageSize={pageSize}
-            total={total}
-            onChange={(p) => onPageChange(p, pageSize)}
-            size="small"
-          />
-        </div>
-      )}
-      {lineups.length === 0 && (
-        <div style={{ textAlign: 'center', color: '#8b949e', padding: 80 }}>
-          暂无匹配的道具点位
-        </div>
+          {total > pageSize && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+              <Pagination
+                current={page}
+                pageSize={pageSize}
+                total={total}
+                onChange={(p) => onPageChange(p, pageSize)}
+                size="small"
+              />
+            </div>
+          )}
+          {lineups.length === 0 && (
+            <div style={{ textAlign: 'center', color: '#8b949e', padding: 80 }}>
+              暂无匹配的道具点位
+            </div>
+          )}
+        </>
       )}
 
       <Modal

@@ -20,6 +20,7 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
   const [selectedMap, setSelectedMap] = useState<number | null>(null);
   const [selectedUtility, setSelectedUtility] = useState<string | null>(null);
   const [selectedSide, setSelectedSide] = useState<string | null>(null);
+  const [keyword, setKeyword] = useState('');
   const [lineups, setLineups] = useState<LineupResponse[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -39,6 +40,7 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
         map_id: selectedMap ?? undefined,
         utility_type: selectedUtility ?? undefined,
         side: selectedSide ?? undefined,
+        keyword: keyword || undefined,
         page,
         page_size: pageSize,
       });
@@ -47,11 +49,11 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
     } finally {
       setLoading(false);
     }
-  }, [selectedMap, selectedUtility, selectedSide, page, pageSize]);
+  }, [selectedMap, selectedUtility, selectedSide, keyword, page, pageSize]);
 
   useEffect(() => {
     setPage(1);
-  }, [selectedMap, selectedUtility, selectedSide]);
+  }, [selectedMap, selectedUtility, selectedSide, keyword]);
 
   useEffect(() => {
     fetchLineups();
@@ -142,6 +144,8 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
         page={page}
         pageSize={pageSize}
         loading={loading}
+        keyword={keyword}
+        onKeywordChange={setKeyword}
         onSelect={handleSelectLineup}
         canCreate={user.role === 'admin' || user.role === 'author'}
         onCreated={fetchLineups}
