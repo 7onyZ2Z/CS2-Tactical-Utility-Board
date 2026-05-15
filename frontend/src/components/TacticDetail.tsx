@@ -86,6 +86,9 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
       setExecutorMap({});
       setFileList([]);
       setSearchKeyword('');
+      if (activePosition) {
+        form.setFieldsValue({ executor: activePosition });
+      }
       listLineups({ map_id: tactic.map_id, page_size: 100 }).then((res) => {
         setMapLineups(res.items.filter((l) => !l.tactics?.some((t) => t.tactic_id === tactic.id)));
       });
@@ -560,7 +563,19 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
                             checked={checked}
                             onChange={(e) => {
                               const next = new Set(selectedIds);
-                              if (e.target.checked) next.add(l.id); else next.delete(l.id);
+                              if (e.target.checked) {
+                                next.add(l.id);
+                                if (activePosition) {
+                                  setExecutorMap((prev) => ({ ...prev, [l.id]: activePosition }));
+                                }
+                              } else {
+                                next.delete(l.id);
+                                setExecutorMap((prev) => {
+                                  const nextMap = { ...prev };
+                                  delete nextMap[l.id];
+                                  return nextMap;
+                                });
+                              }
                               setSelectedIds(next);
                             }}
                           />
