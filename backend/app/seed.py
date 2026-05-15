@@ -25,6 +25,7 @@ def seed(db: Session):
         ("awper", "cqucs2", "author"),
         ("lurker", "cqucs2", "author"),
         ("support", "cqucs2", "author"),
+        ("guest", "guest123", "viewer"),
     ]
     for username, password, role in users:
         if not db.query(User).filter(User.username == username).first():
