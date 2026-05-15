@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Button, Modal, Form, Input, Select, Upload, message, Tabs, Checkbox } from 'antd';
-import { ArrowLeftOutlined, PlusOutlined, UploadOutlined, AimOutlined, DeleteOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, PlusOutlined, UploadOutlined, AimOutlined, DeleteOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd';
 import type { TacticResponse, MapResponse, LineupResponse, TacticAssignment } from '../types';
 import { listLineups, createLineup, updateLineup, uploadMedia } from '../api/lineups';
 import { listMaps } from '../api/maps';
-import { deleteTactic } from '../api/tactics';
+import { deleteTactic, updateTactic } from '../api/tactics';
 import { UTILITY_TYPES, SIDES, MAP_ICONS, TACTIC_CATEGORIES, CATEGORY_COLORS } from './Sidebar';
 import LineupCard from './LineupCard';
 import RadarPicker from './RadarPicker';
+import PositionPicker from './PositionPicker';
 
 const POS_COLORS = ['#4ade80', '#60a5fa', '#f59e0b', '#f472b6', '#a78bfa'];
 const MULTI_LEVEL_MAPS = new Set(['nuke', 'vertigo', 'train']);
@@ -25,10 +26,11 @@ interface TacticDetailProps {
   user: { role: string; id: number };
   onBack: () => void;
   onDeleted?: () => void;
+  onUpdated?: () => void;
   onSelectLineup: (id: number) => void;
 }
 
-export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelectLineup }: TacticDetailProps) {
+export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdated, onSelectLineup }: TacticDetailProps) {
   const [lineups, setLineups] = useState<LineupResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -46,8 +48,17 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [executorMap, setExecutorMap] = useState<Record<number, number | null>>({});
   const [selectLoading, setSelectLoading] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+
+  // Edit tactic state
+  const [editOpen, setEditOpen] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editForm] = Form.useForm();
+  const [posPickerOpen, setPosPickerOpen] = useState(false);
+  const [editPositions, setEditPositions] = useState<Record<string, PositionData | null> | null>(null);
 
   const canCreate = user.role === 'admin' || user.role === 'author';
+  const canEdit = user.role === 'admin' || tactic.created_by === user.id;
   const canDelete = user.role === 'admin' || tactic.created_by === user.id;
   const mapInfo = maps.find((m) => m.id === tactic.map_id);
   const mapIcon = mapInfo ? MAP_ICONS[mapInfo.name] : null;
@@ -74,6 +85,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
       setSelectedIds(new Set());
       setExecutorMap({});
       setFileList([]);
+      setSearchKeyword('');
       listLineups({ map_id: tactic.map_id, page_size: 100 }).then((res) => {
         setMapLineups(res.items.filter((l) => !l.tactics?.some((t) => t.tactic_id === tactic.id)));
       });
@@ -168,6 +180,20 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
     }
   };
 
+  const handleEditSubmit = async (values: { name: string; category: string; description?: string }) => {
+    setEditLoading(true);
+    try {
+      await updateTactic(tactic.id, { ...values, positions: editPositions });
+      message.success('更新成功');
+      setEditOpen(false);
+      onUpdated?.();
+    } catch {
+      message.error('更新失败');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   const handleCancel = () => {
     setModalOpen(false);
     form.resetFields();
@@ -220,6 +246,19 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
               {activePosition}号位 — {filteredLineups.length} 个道具
             </span>
           )}
+          {canEdit && (
+            <Button size="small" icon={<EditOutlined />} onClick={() => {
+              editForm.setFieldsValue({
+                name: tactic.name,
+                category: tactic.category,
+                description: tactic.description ?? '',
+              });
+              setEditPositions(tactic.positions ?? null);
+              setEditOpen(true);
+            }}>
+              编辑战术
+            </Button>
+          )}
           {canCreate && (
             <Button type="primary" size="small" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
               添加道具
@@ -256,7 +295,10 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
       </div>
 
       {/* Radar Map + Description */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0d1117', overflow: 'hidden', position: 'relative' }}>
+      <div
+        onClick={() => setActivePosition(null)}
+        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0d1117', overflow: 'hidden', position: 'relative' }}
+      >
         {tactic.description && (
           <div className="anim-slide-in-left" style={{
             position: 'absolute',
@@ -294,7 +336,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
               <div
                 key={num}
                 className={isActive ? 'anim-pulse-glow' : 'anim-scale-in'}
-                onClick={() => setActivePosition(isActive ? null : num)}
+                onClick={(e) => { e.stopPropagation(); setActivePosition(isActive ? null : num); }}
                 style={{
                   animationDelay: isActive ? undefined : `${num * 80}ms`,
                   position: 'absolute',
@@ -327,7 +369,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
 
       {/* Floating lineup panel */}
       {activePosition && !loading && (
-        <div style={{
+        <div onClick={(e) => e.stopPropagation()} style={{
           position: 'absolute',
           bottom: 16,
           left: 16,
@@ -340,6 +382,27 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
           maxHeight: 200,
           overflowY: 'auto',
         }}>
+          <div
+            onClick={() => setActivePosition(null)}
+            style={{
+              position: 'absolute',
+              top: 6,
+              right: 6,
+              width: 22,
+              height: 22,
+              borderRadius: '50%',
+              background: 'rgba(110,118,129,0.4)',
+              color: '#c9d1d9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              fontSize: 12,
+              zIndex: 5,
+            }}
+          >
+            <CloseOutlined />
+          </div>
           {tactic.positions?.[String(activePosition)]?.duty && (
             <div style={{
               color: POS_COLORS[activePosition - 1],
@@ -394,6 +457,55 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
         </div>
       )}
 
+      {/* Edit Tactic Modal */}
+      <Modal
+        title="编辑战术"
+        open={editOpen}
+        onCancel={() => setEditOpen(false)}
+        onOk={() => editForm.submit()}
+        confirmLoading={editLoading}
+        okText="保存"
+        cancelText="取消"
+        destroyOnClose
+      >
+        <Form form={editForm} layout="vertical" onFinish={handleEditSubmit}>
+          <Form.Item name="name" label="战术名称" rules={[{ required: true, message: '请输入名称' }]}>
+            <Input placeholder="如：A区默认烟" />
+          </Form.Item>
+          <Form.Item name="category" label="战术分类" rules={[{ required: true, message: '请选择分类' }]}>
+            <Select placeholder="选择分类">
+              {TACTIC_CATEGORIES.map((c) => (
+                <Select.Option key={c.value} value={c.value}>{c.label}</Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item label="位置分配">
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <Button
+                icon={<AimOutlined />}
+                disabled={!mapInfo}
+                onClick={() => setPosPickerOpen(true)}
+              >
+                {editPositions ? '已分配 — 重新选择' : '分配位置'}
+              </Button>
+              {!mapInfo && <span style={{ color: '#8b949e', fontSize: 12 }}>地图信息不可用</span>}
+            </div>
+          </Form.Item>
+          <Form.Item name="description" label="描述">
+            <Input.TextArea rows={3} placeholder="战术整体说明（可选）" />
+          </Form.Item>
+        </Form>
+      </Modal>
+      <PositionPicker
+        open={posPickerOpen}
+        map={mapInfo ?? null}
+        onConfirm={(pos) => {
+          setEditPositions(pos);
+          setPosPickerOpen(false);
+        }}
+        onCancel={() => setPosPickerOpen(false)}
+      />
+
       {/* Add Lineup Modal with Tabs */}
       <Modal
         title="添加道具"
@@ -410,11 +522,24 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onSelect
               label: '选择已有道具',
               children: (
                 <div>
+                  <Input.Search
+                    placeholder="搜索道具名称..."
+                    allowClear
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    style={{ marginBottom: 12 }}
+                  />
                   <div style={{ maxHeight: 400, overflowY: 'auto', marginBottom: 12 }}>
-                    {mapLineups.length === 0 && (
-                      <div style={{ textAlign: 'center', color: '#8b949e', padding: 40 }}>该地图暂无可用道具</div>
+                    {mapLineups.filter((l) =>
+                      !searchKeyword || l.name.toLowerCase().includes(searchKeyword.toLowerCase())
+                    ).length === 0 && (
+                      <div style={{ textAlign: 'center', color: '#8b949e', padding: 40 }}>
+                        {searchKeyword ? '无匹配道具' : '该地图暂无可用道具'}
+                      </div>
                     )}
-                    {mapLineups.map((l) => {
+                    {mapLineups.filter((l) =>
+                      !searchKeyword || l.name.toLowerCase().includes(searchKeyword.toLowerCase())
+                    ).map((l) => {
                       const checked = selectedIds.has(l.id);
                       const utilityLabel = UTILITY_TYPES.find((u) => u.value === l.utility_type)?.label ?? l.utility_type;
                       return (

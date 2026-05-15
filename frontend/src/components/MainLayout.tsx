@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { UserResponse, LineupResponse, TacticResponse } from '../types';
 import { listLineups, getLineup, deleteLineup } from '../api/lineups';
+import { getTactic } from '../api/tactics';
 import { message } from 'antd';
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -115,6 +116,12 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
             user={user}
             onBack={() => setSelectedTactic(null)}
             onDeleted={() => setSelectedTactic(null)}
+            onUpdated={async () => {
+              try {
+                const updated = await getTactic(selectedTactic!.id);
+                setSelectedTactic(updated);
+              } catch { /* ignore */ }
+            }}
             onSelectLineup={handleSelectLineup}
           />
         );
