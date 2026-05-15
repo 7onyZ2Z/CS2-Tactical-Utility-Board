@@ -19,11 +19,16 @@ def list_lineups(
     side: str | None = None,
     tactic_id: int | None = None,
     keyword: str | None = None,
+    sort_by: str = Query("created_at", pattern=r"^(created_at|name)$"),
+    sort_order: str = Query("desc", pattern=r"^(asc|desc)$"),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
     _current_user: User = Depends(get_current_user),
 ):
+    sort_col = Lineup.name if sort_by == "name" else Lineup.created_at
+    sort_fn = sort_col.asc() if sort_order == "asc" else sort_col.desc()
+
     query = db.query(Lineup).options(joinedload(Lineup.media))
 
     if map_id is not None:
@@ -36,7 +41,7 @@ def list_lineups(
         query = query.filter(Lineup.name.ilike(f"%{keyword}%"))
 
     if tactic_id is not None:
-        all_lineups = query.order_by(Lineup.created_at.desc()).all()
+        all_lineups = query.order_by(sort_fn).all()
         filtered = [
             l for l in all_lineups
             if l.tactics and any(t.get("tactic_id") == tactic_id for t in l.tactics)
@@ -48,7 +53,7 @@ def list_lineups(
 
     total = query.count()
     items = (
-        query.order_by(Lineup.created_at.desc())
+        query.order_by(sort_fn)
         .offset((page - 1) * page_size)
         .limit(page_size)
         .all()

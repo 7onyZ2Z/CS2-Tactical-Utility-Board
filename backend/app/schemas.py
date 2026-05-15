@@ -89,6 +89,13 @@ class TacticResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class TacticListResponse(BaseModel):
+    items: list[TacticResponse]
+    total: int
+    page: int
+    page_size: int
+
+
 # --- Lineups ---
 
 

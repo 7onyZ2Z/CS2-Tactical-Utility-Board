@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Spin, Button, Modal, Form, Input, Select, Upload, Pagination, message } from 'antd';
+import { Spin, Button, Modal, Form, Input, Select, Upload, Pagination, Segmented, message } from 'antd';
 import { PlusOutlined, UploadOutlined, AimOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd';
 import type { LineupResponse, MapResponse } from '../types';
@@ -17,13 +17,16 @@ interface LineupGridProps {
   loading: boolean;
   keyword: string;
   onKeywordChange: (value: string) => void;
+  sortBy: string;
+  sortOrder: string;
+  onSortChange: (sortBy: string, sortOrder: string) => void;
   onSelect: (id: number) => void;
   canCreate: boolean;
   onCreated: () => void;
   onPageChange: (page: number, pageSize: number) => void;
 }
 
-export default function LineupGrid({ lineups, total, page, pageSize, loading, keyword, onKeywordChange, onSelect, canCreate, onCreated, onPageChange }: LineupGridProps) {
+export default function LineupGrid({ lineups, total, page, pageSize, loading, keyword, onKeywordChange, sortBy, sortOrder, onSortChange, onSelect, canCreate, onCreated, onPageChange }: LineupGridProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [maps, setMaps] = useState<MapResponse[]>([]);
@@ -75,7 +78,7 @@ export default function LineupGrid({ lineups, total, page, pageSize, loading, ke
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, gap: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, gap: 12, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ color: '#c9d1d9', fontSize: 14, whiteSpace: 'nowrap' }}>找到 {total} 个点位</span>
           <Input.Search
@@ -86,6 +89,21 @@ export default function LineupGrid({ lineups, total, page, pageSize, loading, ke
             style={{ width: 220 }}
             size="small"
           />
+          <Segmented
+            size="small"
+            value={sortBy}
+            onChange={(val) => onSortChange(val as string, sortOrder)}
+            options={[
+              { value: 'created_at', label: '创建时间' },
+              { value: 'name', label: '名称' },
+            ]}
+          />
+          <Button
+            size="small"
+            onClick={() => onSortChange(sortBy, sortOrder === 'asc' ? 'desc' : 'asc')}
+          >
+            {sortOrder === 'asc' ? '↑ 升序' : '↓ 降序'}
+          </Button>
         </div>
         {canCreate && (
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>

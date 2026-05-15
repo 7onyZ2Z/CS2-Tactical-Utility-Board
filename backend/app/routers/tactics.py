@@ -1,24 +1,43 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..dependencies import get_current_user, require_role
 from ..models import Lineup, Tactic, Map, User
-from ..schemas import TacticCreate, TacticResponse, TacticUpdate
+from ..schemas import TacticCreate, TacticListResponse, TacticResponse, TacticUpdate
 
 router = APIRouter(prefix="/api/tactics", tags=["tactics"])
 
 
-@router.get("", response_model=list[TacticResponse])
+@router.get("", response_model=TacticListResponse)
 def list_tactics(
     map_id: int | None = None,
+    keyword: str | None = None,
+    sort_by: str = Query("id", pattern=r"^(id|name)$"),
+    sort_order: str = Query("desc", pattern=r"^(asc|desc)$"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
     _current_user: User = Depends(get_current_user),
 ):
+    sort_col = Tactic.name if sort_by == "name" else Tactic.id
+    sort_fn = sort_col.asc() if sort_order == "asc" else sort_col.desc()
+
     query = db.query(Tactic)
     if map_id is not None:
         query = query.filter(Tactic.map_id == map_id)
-    return query.order_by(Tactic.id.desc()).all()
+    if keyword:
+        query = query.filter(Tactic.name.ilike(f"%{keyword}%"))
+
+    total = query.count()
+    items = (
+        query.order_by(sort_fn)
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+
+    return TacticListResponse(items=items, total=total, page=page, page_size=page_size)
 
 
 @router.get("/{tactic_id}", response_model=TacticResponse)

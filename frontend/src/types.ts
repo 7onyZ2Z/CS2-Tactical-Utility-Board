@@ -65,6 +65,8 @@ export interface LineupQueryParams {
   side?: string;
   tactic_id?: number;
   keyword?: string;
+  sort_by?: string;
+  sort_order?: string;
   page?: number;
   page_size?: number;
 }
@@ -84,4 +86,20 @@ export interface TacticResponse {
   positions: Record<string, PositionData | null> | null;
   map_id: number;
   created_by: number;
+}
+
+export interface TacticListResponse {
+  items: TacticResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface TacticQueryParams {
+  map_id?: number;
+  keyword?: string;
+  sort_by?: string;
+  sort_order?: string;
+  page?: number;
+  page_size?: number;
 }

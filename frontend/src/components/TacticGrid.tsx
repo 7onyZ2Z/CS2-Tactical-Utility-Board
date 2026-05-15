@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Spin, Button, Modal, Form, Input, Select, message } from 'antd';
+import { useState, useEffect, useCallback } from 'react';
+import { Spin, Button, Modal, Form, Input, Select, Pagination, Segmented, message } from 'antd';
 import { PlusOutlined, AimOutlined } from '@ant-design/icons';
 import type { TacticResponse, MapResponse, PositionData } from '../types';
 import { listTactics, createTactic } from '../api/tactics';
@@ -15,7 +15,13 @@ interface TacticGridProps {
 
 export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticGridProps) {
   const [tactics, setTactics] = useState<TacticResponse[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
   const [loading, setLoading] = useState(false);
+  const [keyword, setKeyword] = useState('');
+  const [sortBy, setSortBy] = useState('id');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [maps, setMaps] = useState<MapResponse[]>([]);
@@ -24,12 +30,27 @@ export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticG
   const [positions, setPositions] = useState<Record<string, PositionData | null> | null>(null);
   const [form] = Form.useForm();
 
-  useEffect(() => {
+  const fetchTactics = useCallback(() => {
     setLoading(true);
-    listTactics(selectedMap ?? undefined)
-      .then(setTactics)
+    listTactics({
+      map_id: selectedMap ?? undefined,
+      keyword: keyword || undefined,
+      sort_by: sortBy,
+      sort_order: sortOrder,
+      page,
+      page_size: pageSize,
+    })
+      .then((res) => { setTactics(res.items); setTotal(res.total); })
       .finally(() => setLoading(false));
-  }, [selectedMap]);
+  }, [selectedMap, keyword, sortBy, sortOrder, page, pageSize]);
+
+  useEffect(() => {
+    fetchTactics();
+  }, [fetchTactics]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedMap, keyword, sortBy, sortOrder]);
 
   useEffect(() => {
     listMaps().then(setMaps);
@@ -44,7 +65,7 @@ export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticG
       form.resetFields();
       setPositions(null);
       setSelectedMapForPos(null);
-      listTactics(selectedMap ?? undefined).then(setTactics);
+      fetchTactics();
     } catch {
       message.error('创建失败');
     } finally {
@@ -61,18 +82,35 @@ export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticG
     return maps.find((m) => m.id === mapId)?.display_name ?? '';
   };
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
-        <Spin size="large" />
-      </div>
-    );
-  }
-
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <span style={{ color: '#c9d1d9', fontSize: 14 }}>找到 {tactics.length} 个战术</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, gap: 12, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ color: '#c9d1d9', fontSize: 14, whiteSpace: 'nowrap' }}>找到 {total} 个战术</span>
+          <Input.Search
+            placeholder="搜索战术名称..."
+            allowClear
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            style={{ width: 220 }}
+            size="small"
+          />
+          <Segmented
+            size="small"
+            value={sortBy}
+            onChange={(val) => setSortBy(val as string)}
+            options={[
+              { value: 'id', label: '创建顺序' },
+              { value: 'name', label: '名称' },
+            ]}
+          />
+          <Button
+            size="small"
+            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+          >
+            {sortOrder === 'asc' ? '↑ 升序' : '↓ 降序'}
+          </Button>
+        </div>
         {canCreate && (
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
             新增战术
@@ -80,66 +118,86 @@ export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticG
         )}
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-        gap: 16,
-      }}>
-        {tactics.map((t, i) => {
-          const icon = getMapIcon(t.map_id);
-          return (
-            <div
-              key={t.id}
-              className="anim-fade-in-up"
-              onClick={() => onSelect(t)}
-              style={{
-                animationDelay: `${i * 50}ms`,
-                cursor: 'pointer',
-                background: '#161b22',
-                border: '1px solid #21262d',
-                borderRadius: 8,
-                padding: 16,
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.borderColor = '#4ade80';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = '#21262d';
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ color: '#e0e0e0', fontSize: 16, fontWeight: 'bold' }}>{t.name}</span>
-                    <span style={{
-                      color: CATEGORY_COLORS[t.category] ?? '#8b949e',
-                      fontSize: 11,
-                      background: `${CATEGORY_COLORS[t.category] ?? '#8b949e'}20`,
-                      padding: '1px 6px',
-                      borderRadius: 4,
-                      fontWeight: 'bold',
-                    }}>
-                      {TACTIC_CATEGORIES.find((c) => c.value === t.category)?.label ?? t.category}
-                    </span>
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
+          <Spin size="large" />
+        </div>
+      ) : (
+        <>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+            gap: 16,
+          }}>
+            {tactics.map((t, i) => {
+              const icon = getMapIcon(t.map_id);
+              return (
+                <div
+                  key={t.id}
+                  className="anim-fade-in-up"
+                  onClick={() => onSelect(t)}
+                  style={{
+                    animationDelay: `${i * 50}ms`,
+                    cursor: 'pointer',
+                    background: '#161b22',
+                    border: '1px solid #21262d',
+                    borderRadius: 8,
+                    padding: 16,
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.borderColor = '#4ade80';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.borderColor = '#21262d';
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ color: '#e0e0e0', fontSize: 16, fontWeight: 'bold' }}>{t.name}</span>
+                        <span style={{
+                          color: CATEGORY_COLORS[t.category] ?? '#8b949e',
+                          fontSize: 11,
+                          background: `${CATEGORY_COLORS[t.category] ?? '#8b949e'}20`,
+                          padding: '1px 6px',
+                          borderRadius: 4,
+                          fontWeight: 'bold',
+                        }}>
+                          {TACTIC_CATEGORIES.find((c) => c.value === t.category)?.label ?? t.category}
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                      {icon && <img src={icon} alt="" style={{ width: 24, height: 24, objectFit: 'contain' }} />}
+                      <span style={{ color: '#8b949e', fontSize: 12 }}>{getMapName(t.map_id)}</span>
+                    </div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                  {icon && <img src={icon} alt="" style={{ width: 24, height: 24, objectFit: 'contain' }} />}
-                  <span style={{ color: '#8b949e', fontSize: 12 }}>{getMapName(t.map_id)}</span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+              );
+            })}
+          </div>
 
-      {tactics.length === 0 && (
-        <div style={{ textAlign: 'center', color: '#8b949e', padding: 80 }}>
-          暂无战术，点击右上角创建
-        </div>
+          {total > pageSize && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+              <Pagination
+                current={page}
+                pageSize={pageSize}
+                total={total}
+                onChange={(p) => setPage(p)}
+                size="small"
+              />
+            </div>
+          )}
+
+          {tactics.length === 0 && (
+            <div style={{ textAlign: 'center', color: '#8b949e', padding: 80 }}>
+              暂无战术，点击右上角创建
+            </div>
+          )}
+        </>
       )}
 
       <Modal
