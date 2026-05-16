@@ -170,21 +170,6 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
         )}
       </div>
 
-      {lineup.description && (
-        <div className="anim-slide-in-left" style={{
-          color: '#f5ead6',
-          fontSize: 14,
-          lineHeight: 1.6,
-          marginBottom: 16,
-          background: '#221d18',
-          border: '1px solid #3d3628',
-          borderRadius: 8,
-          padding: 16,
-        }}>
-          {lineup.description}
-        </div>
-      )}
-
       <div style={{
         background: '#221d18',
         border: '1px solid #3d3628',
@@ -281,6 +266,21 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
           </div>
         )}
       </div>
+
+      {lineup.description && (
+        <div className="anim-slide-in-left" style={{
+          color: '#f5ead6',
+          fontSize: 14,
+          lineHeight: 1.6,
+          marginBottom: 16,
+          background: '#221d18',
+          border: '1px solid #3d3628',
+          borderRadius: 8,
+          padding: 16,
+        }}>
+          {lineup.description}
+        </div>
+      )}
 
       {/* Radar map with position marker */}
       {lineup.pos_x != null && lineup.pos_y != null && mapInfo && (
