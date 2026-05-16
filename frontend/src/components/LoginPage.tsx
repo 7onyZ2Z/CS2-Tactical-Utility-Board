@@ -20,6 +20,7 @@ const WARM = {
 
 export default function LoginPage({ onLogin }: LoginPageProps) {
   const [loading, setLoading] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
 
   const handleSubmit = async (values: { username: string; password: string }) => {
     setLoading(true);
@@ -29,6 +30,17 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       message.error('用户名或密码错误');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    setGuestLoading(true);
+    try {
+      await onLogin('guest', 'guest123');
+    } catch {
+      message.error('游客登录失败');
+    } finally {
+      setGuestLoading(false);
     }
   };
 
@@ -117,9 +129,14 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                 />
               </Form.Item>
               <Form.Item style={{ marginBottom: 0 }}>
-                <Button type="primary" htmlType="submit" loading={loading} block>
-                  登录
-                </Button>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <Button type="primary" htmlType="submit" loading={loading} style={{ flex: 2 }}>
+                    登录
+                  </Button>
+                  <Button loading={guestLoading} onClick={handleGuestLogin} style={{ flex: 1, background: 'transparent', borderColor: WARM.inputBorder, color: WARM.brown }}>
+                    游客登录
+                  </Button>
+                </div>
               </Form.Item>
             </Form>
           </Card>
