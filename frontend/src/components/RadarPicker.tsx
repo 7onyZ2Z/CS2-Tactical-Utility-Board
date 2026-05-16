@@ -129,6 +129,7 @@ export default function RadarPicker({ open, map, onConfirm, onCancel }: Props) {
       open={open}
       onCancel={onCancel}
       centered
+      zIndex={1050}
       footer={[
         <Button key="cancel" onClick={onCancel}>取消</Button>,
         <Button key="confirm" type="primary" disabled={!marker} onClick={handleConfirm}>

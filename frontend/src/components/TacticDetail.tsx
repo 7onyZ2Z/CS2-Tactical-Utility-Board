@@ -502,6 +502,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
       <PositionPicker
         open={posPickerOpen}
         map={mapInfo ?? null}
+        initialPositions={editPositions}
         onConfirm={(pos) => {
           setEditPositions(pos);
           setPosPickerOpen(false);

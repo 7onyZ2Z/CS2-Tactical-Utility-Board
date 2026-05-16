@@ -15,11 +15,22 @@ function getRadarUrl(mapName: string, z: number): string {
 interface Props {
   open: boolean;
   map: MapResponse | null;
+  initialPositions?: Record<string, PositionData | null> | null;
   onConfirm: (positions: Record<string, PositionData | null>) => void;
   onCancel: () => void;
 }
 
-export default function PositionPicker({ open, map, onConfirm, onCancel }: Props) {
+function toNumberPositions(p: Record<string, PositionData | null> | null | undefined): Record<number, PositionData | null> {
+  const result: Record<number, PositionData | null> = {};
+  if (!p) return result;
+  for (const key of Object.keys(p)) {
+    const num = Number(key);
+    if (num >= 1 && num <= 5) result[num] = p[key];
+  }
+  return result;
+}
+
+export default function PositionPicker({ open, map, initialPositions, onConfirm, onCancel }: Props) {
   const [z, setZ] = useState(0);
   const [positions, setPositions] = useState<Record<number, PositionData | null>>({});
   const [dragging, setDragging] = useState<number | null>(null);
@@ -30,7 +41,7 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
 
   useEffect(() => {
     if (open) {
-      setPositions({});
+      setPositions(toNumberPositions(initialPositions));
       setZ(0);
       setDragging(null);
       setConfirmed(false);
@@ -109,6 +120,7 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
       open={open}
       onCancel={onCancel}
       centered
+      zIndex={1050}
       width="auto"
       footer={
         confirmed
