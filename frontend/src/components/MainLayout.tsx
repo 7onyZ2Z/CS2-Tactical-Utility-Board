@@ -181,7 +181,7 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
       </div>
 
       <Modal
-        title="欢迎使用道具学院"
+        title="欢迎使用学院CS"
         open={welcomeOpen}
         onCancel={() => { setWelcomeOpen(false); sessionStorage.setItem('welcome-shown', '1'); }}
         footer={null}
