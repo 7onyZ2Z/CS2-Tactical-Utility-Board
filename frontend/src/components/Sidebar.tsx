@@ -101,7 +101,7 @@ export default function Sidebar({
     position: 'relative',
   });
 
-  const countBadge = (n: number): React.CSSProperties => ({
+  const countBadge: React.CSSProperties = {
     position: 'absolute',
     top: 2,
     right: 2,
@@ -117,7 +117,7 @@ export default function Sidebar({
     justifyContent: 'center',
     padding: '0 3px',
     lineHeight: '14px',
-  });
+  };
 
   const sectionLabel: React.CSSProperties = {
     color: '#b8956a',
@@ -164,7 +164,7 @@ export default function Sidebar({
                   />
                 )}
                 <span>{m.display_name}</span>
-                {n > 0 && <span style={countBadge(n)}>{n}</span>}
+                {n > 0 && <span style={countBadge}>{n}</span>}
               </div>
               );
             })}
@@ -190,7 +190,7 @@ export default function Sidebar({
                     />
                   )}
                   <span style={{ fontSize: 10 }}>{m.display_name}</span>
-                  {n > 0 && <span style={countBadge(n)}>{n}</span>}
+                  {n > 0 && <span style={countBadge}>{n}</span>}
                 </div>
                 );
               })}
@@ -213,7 +213,7 @@ export default function Sidebar({
                     style={{ width: 24, height: 24, objectFit: 'contain', borderRadius: 2 }}
                   />
                   <span style={{ fontSize: 10 }}>{s.label}</span>
-                  {n > 0 && <span style={countBadge(n)}>{n}</span>}
+                  {n > 0 && <span style={countBadge}>{n}</span>}
                 </div>
                 );
               })}
@@ -236,7 +236,7 @@ export default function Sidebar({
                     style={{ width: 24, height: 24, objectFit: 'contain', borderRadius: 2 }}
                   />
                   <span style={{ fontSize: 10 }}>{u.label}</span>
-                  {n > 0 && <span style={countBadge(n)}>{n}</span>}
+                  {n > 0 && <span style={countBadge}>{n}</span>}
                 </div>
                 );
               })}
