@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Spin, Tag, Carousel, Button, Modal, Form, Input, Select, message, Image } from 'antd';
+import { Spin, Carousel, Button, Modal, Form, Input, Select, message, Image } from 'antd';
 import type { CarouselRef } from 'antd/es/carousel';
 import { ArrowLeftOutlined, LeftOutlined, RightOutlined, DeleteOutlined, EditOutlined, AimOutlined } from '@ant-design/icons';
 import type { LineupResponse, UserResponse, MapResponse } from '../types';
@@ -9,6 +9,8 @@ import { UTILITY_TYPES, SIDES } from './Sidebar';
 import RadarPicker from './RadarPicker';
 
 const MULTI_LEVEL_MAPS = new Set(['nuke', 'vertigo', 'train']);
+const SIDE_COLORS: Record<string, string> = { ct: '#4a90d9', t: '#d4a853' };
+const UTILITY_COLORS: Record<string, string> = { smoke: '#d4a853', flash: '#e8e8e8', molotov: '#e05540', he: '#b895c0' };
 
 function getRadarUrl(mapName: string, z: number): string {
   if (MULTI_LEVEL_MAPS.has(mapName)) {
@@ -160,8 +162,24 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <h2 style={{ color: '#f5ead6', margin: 0 }}>{lineup.name}</h2>
-          <Tag color="gold">{sideLabel}</Tag>
-          <Tag>{utilityLabel}</Tag>
+          <span style={{
+            color: SIDE_COLORS[lineup.side] ?? '#b8956a',
+            background: `${SIDE_COLORS[lineup.side] ?? '#b8956a'}20`,
+            padding: '1px 6px',
+            borderRadius: 3,
+            fontSize: 12,
+            fontWeight: 'bold',
+            lineHeight: '20px',
+          }}>{sideLabel}</span>
+          <span style={{
+            color: UTILITY_COLORS[lineup.utility_type] ?? '#b8956a',
+            background: `${UTILITY_COLORS[lineup.utility_type] ?? '#b8956a'}20`,
+            padding: '1px 6px',
+            borderRadius: 3,
+            fontSize: 12,
+            fontWeight: 'bold',
+            lineHeight: '20px',
+          }}>{utilityLabel}</span>
         </div>
         {canEdit && (
           <Button icon={<EditOutlined />} onClick={() => setEditOpen(true)}>
