@@ -7,7 +7,8 @@ from sqlalchemy.orm import Session, joinedload
 from ..database import get_db
 from ..dependencies import get_current_user, require_role
 from ..models import Lineup, Map, Tactic, User
-from ..schemas import LineupCreate, LineupListResponse, LineupResponse, LineupUpdate
+from ..schemas import LineupCountsResponse, LineupCreate, LineupListResponse, LineupResponse, LineupUpdate
+from sqlalchemy import func
 
 router = APIRouter(prefix="/api/lineups", tags=["lineups"])
 
@@ -60,6 +61,34 @@ def list_lineups(
     )
 
     return LineupListResponse(items=items, total=total, page=page, page_size=page_size)
+
+
+@router.get("/counts", response_model=LineupCountsResponse)
+def get_lineup_counts(
+    map_id: int | None = None,
+    utility_type: str | None = None,
+    side: str | None = None,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(get_current_user),
+):
+    def make_base(exclude_map=False, exclude_utility=False, exclude_side=False):
+        q = db.query(Lineup)
+        if map_id is not None and not exclude_map:
+            q = q.filter(Lineup.map_id == map_id)
+        if utility_type and not exclude_utility:
+            q = q.filter(Lineup.utility_type == utility_type)
+        if side and not exclude_side:
+            q = q.filter(Lineup.side == side)
+        return q
+
+    map_rows = make_base(exclude_map=True).with_entities(Lineup.map_id, func.count(Lineup.id)).group_by(Lineup.map_id).all()
+    utility_rows = make_base(exclude_utility=True).with_entities(Lineup.utility_type, func.count(Lineup.id)).group_by(Lineup.utility_type).all()
+    side_rows = make_base(exclude_side=True).with_entities(Lineup.side, func.count(Lineup.id)).group_by(Lineup.side).all()
+    return LineupCountsResponse(
+        maps={str(k): v for k, v in map_rows},
+        utilities={str(k): v for k, v in utility_rows},
+        sides={str(k): v for k, v in side_rows},
+    )
 
 
 @router.get("/{lineup_id}", response_model=LineupResponse)

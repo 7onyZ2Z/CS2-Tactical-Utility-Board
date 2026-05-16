@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { listMaps } from '../api/maps';
-import type { MapResponse } from '../types';
+import { getLineupCounts } from '../api/lineups';
+import type { MapResponse, LineupCountsResponse } from '../types';
+import { ClearOutlined } from '@ant-design/icons';
 
 export const UTILITY_TYPES = [
   { value: 'smoke', label: '烟雾弹', icon: '/utility_icon/smokegrenade.webp' },
@@ -59,10 +61,19 @@ export default function Sidebar({
   onSideChange,
 }: SidebarProps) {
   const [maps, setMaps] = useState<MapResponse[]>([]);
+  const [counts, setCounts] = useState<LineupCountsResponse>({ maps: {}, utilities: {}, sides: {} });
 
   useEffect(() => {
     listMaps().then(setMaps);
   }, []);
+
+  useEffect(() => {
+    getLineupCounts({
+      map_id: selectedMap ?? undefined,
+      utility_type: selectedUtility ?? undefined,
+      side: selectedSide ?? undefined,
+    }).then(setCounts);
+  }, [selectedMap, selectedUtility, selectedSide]);
 
   const btnStyle = (active: boolean): React.CSSProperties => ({
     padding: '4px 6px',
@@ -79,6 +90,25 @@ export default function Sidebar({
     flexDirection: 'column',
     alignItems: 'center',
     gap: 2,
+    position: 'relative',
+  });
+
+  const countBadge = (n: number): React.CSSProperties => ({
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    minWidth: 14,
+    height: 14,
+    borderRadius: 7,
+    background: 'rgba(0,0,0,0.55)',
+    color: '#f5ead6',
+    fontSize: 9,
+    fontWeight: 'bold',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '0 3px',
+    lineHeight: '14px',
   });
 
   const sectionLabel: React.CSSProperties = {
@@ -109,7 +139,9 @@ export default function Sidebar({
       }}>
         {view === 'tactics' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
-            {maps.map((m) => (
+            {maps.map((m) => {
+              const n = counts.maps[String(m.id)] ?? 0;
+              return (
               <div
                 key={m.id}
                 className="sb-btn"
@@ -124,14 +156,18 @@ export default function Sidebar({
                   />
                 )}
                 <span>{m.display_name}</span>
+                {n > 0 && <span style={countBadge(n)}>{n}</span>}
               </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <>
             <div style={sectionLabel}>地图</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 16 }}>
-              {maps.map((m) => (
+              {maps.map((m) => {
+                const n = counts.maps[String(m.id)] ?? 0;
+                return (
                 <div
                   key={m.id}
                   className="sb-btn"
@@ -146,32 +182,17 @@ export default function Sidebar({
                     />
                   )}
                   <span>{m.display_name}</span>
+                  {n > 0 && <span style={countBadge(n)}>{n}</span>}
                 </div>
-              ))}
-            </div>
-
-            <div style={sectionLabel}>道具</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 16 }}>
-              {UTILITY_TYPES.map((u) => (
-                <div
-                  key={u.value}
-                  className="sb-btn"
-                  style={btnStyle(selectedUtility === u.value)}
-                  onClick={() => onUtilityChange(selectedUtility === u.value ? null : u.value)}
-                >
-                  <img
-                    src={u.icon}
-                    alt={u.label}
-                    style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 2 }}
-                  />
-                  <span>{u.label}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div style={sectionLabel}>阵营</div>
-            <div style={{ display: 'flex', gap: 6 }}>
-              {SIDES.map((s) => (
+            <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+              {SIDES.map((s) => {
+                const n = counts.sides[s.value] ?? 0;
+                return (
                 <div
                   key={s.value}
                   className="sb-btn"
@@ -184,9 +205,66 @@ export default function Sidebar({
                     style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 2 }}
                   />
                   <span>{s.label}</span>
+                  {n > 0 && <span style={countBadge(n)}>{n}</span>}
                 </div>
-              ))}
+                );
+              })}
             </div>
+
+            <div style={sectionLabel}>道具</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+              {UTILITY_TYPES.map((u) => {
+                const n = counts.utilities[u.value] ?? 0;
+                return (
+                <div
+                  key={u.value}
+                  className="sb-btn"
+                  style={btnStyle(selectedUtility === u.value)}
+                  onClick={() => onUtilityChange(selectedUtility === u.value ? null : u.value)}
+                >
+                  <img
+                    src={u.icon}
+                    alt={u.label}
+                    style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 2 }}
+                  />
+                  <span>{u.label}</span>
+                  {n > 0 && <span style={countBadge(n)}>{n}</span>}
+                </div>
+                );
+              })}
+            </div>
+
+            {(selectedMap || selectedUtility || selectedSide) && (
+              <div
+                onClick={() => { onMapChange(null); onUtilityChange(null); onSideChange(null); }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 4,
+                  marginTop: 4,
+                  padding: '6px 0',
+                  borderRadius: 4,
+                  cursor: 'pointer',
+                  color: '#b8956a',
+                  fontSize: 12,
+                  border: '1px solid #4a3d2e',
+                  background: 'transparent',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#d4a853';
+                  e.currentTarget.style.borderColor = '#d4a853';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#b8956a';
+                  e.currentTarget.style.borderColor = '#4a3d2e';
+                }}
+              >
+                <ClearOutlined />
+                重置筛选
+              </div>
+            )}
           </>
         )}
       </div>

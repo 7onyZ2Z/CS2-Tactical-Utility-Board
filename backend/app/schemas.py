@@ -162,3 +162,9 @@ class LineupListResponse(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+class LineupCountsResponse(BaseModel):
+    maps: dict[str, int]
+    utilities: dict[str, int]
+    sides: dict[str, int]

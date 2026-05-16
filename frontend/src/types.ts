@@ -59,6 +59,12 @@ export interface LineupListResponse {
   page_size: number;
 }
 
+export interface LineupCountsResponse {
+  maps: Record<string, number>;
+  utilities: Record<string, number>;
+  sides: Record<string, number>;
+}
+
 export interface LineupQueryParams {
   map_id?: number;
   utility_type?: string;

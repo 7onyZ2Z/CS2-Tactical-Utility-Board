@@ -1,5 +1,14 @@
 import client from './client';
-import type { LineupListResponse, LineupQueryParams, LineupResponse, TacticAssignment } from '../types';
+import type { LineupCountsResponse, LineupListResponse, LineupQueryParams, LineupResponse, TacticAssignment } from '../types';
+
+export async function getLineupCounts(params?: {
+  map_id?: number;
+  utility_type?: string;
+  side?: string;
+}): Promise<LineupCountsResponse> {
+  const res = await client.get<LineupCountsResponse>('/api/lineups/counts', { params });
+  return res.data;
+}
 
 export async function listLineups(params?: LineupQueryParams): Promise<LineupListResponse> {
   const res = await client.get<LineupListResponse>('/api/lineups', { params });
