@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { UserResponse, LineupResponse, TacticResponse } from '../types';
 import { listLineups, getLineup, deleteLineup } from '../api/lineups';
 import { getTactic } from '../api/tactics';
-import { message } from 'antd';
+import { Modal, message } from 'antd';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import LineupGrid from './LineupGrid';
@@ -34,6 +34,7 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
   const [detailLoading, setDetailLoading] = useState(false);
 
   const [selectedTactic, setSelectedTactic] = useState<TacticResponse | null>(null);
+  const [welcomeOpen, setWelcomeOpen] = useState(true);
 
   const fetchLineups = useCallback(async () => {
     setLoading(true);
@@ -178,6 +179,47 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
           {renderContent()}
         </div>
       </div>
+
+      <Modal
+        title="欢迎使用道具学院"
+        open={welcomeOpen}
+        onCancel={() => setWelcomeOpen(false)}
+        footer={null}
+        width={520}
+      >
+        <div style={{ color: '#f5ead6', fontSize: 14, lineHeight: 2 }}>
+          <p style={{ marginTop: 0 }}>
+            本工具用于 <b style={{ color: '#d4a853' }}>CS2 道具点位</b> 速查与战术管理，适合 5 人小队使用。
+          </p>
+
+          <h4 style={{ color: '#d4a853', margin: '16px 0 4px' }}>道具学院</h4>
+          <ul style={{ paddingLeft: 20, margin: '4px 0' }}>
+            <li>左侧选择 <b>地图 / 道具 / 阵营</b> 筛选点位</li>
+            <li>搜索框支持 <b>模糊搜索</b> 道具名称</li>
+            <li>切换 <b>创建时间 / 名称</b> 排序，支持升降序</li>
+            <li>点击卡片查看详情：图片轮播、雷达图标记、编辑与删除</li>
+          </ul>
+
+          <h4 style={{ color: '#d4a853', margin: '16px 0 4px' }}>战术学院</h4>
+          <ul style={{ paddingLeft: 20, margin: '4px 0' }}>
+            <li>为每张地图创建 <b>战术方案</b>（ECO / 强起 / 长枪）</li>
+            <li>雷达图上 <b>拖动位置标记</b> 分配 1-5 号位</li>
+            <li>点击位号查看关联道具，支持 <b>添加 / 移除</b></li>
+            <li>仅有 <b>创建者和管理员</b> 可编辑或删除战术</li>
+          </ul>
+
+          <h4 style={{ color: '#d4a853', margin: '16px 0 4px' }}>账号与权限</h4>
+          <ul style={{ paddingLeft: 20, margin: '4px 0' }}>
+            <li><b>Admin</b>：可以编辑删除所有内容</li>
+            <li><b>Author</b>：可以创建自己的内容和团队账号</li>
+            <li><b>Viewer</b>：只能查看，不能修改</li>
+          </ul>
+
+          <p style={{ color: '#b8956a', fontSize: 12, margin: '12px 0 0' }}>
+            点击顶部标题可在道具学院和战术学院之间切换
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 }
