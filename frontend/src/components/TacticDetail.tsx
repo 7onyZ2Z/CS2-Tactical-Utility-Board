@@ -236,6 +236,7 @@ export default function TacticDetail({ tactic, user, onBack, onDeleted, onUpdate
           }}>
             {TACTIC_CATEGORIES.find((c) => c.value === tactic.category)?.label ?? tactic.category}
           </span>
+          <span style={{ color: '#8a7560', fontSize: 11 }}>点击数字按钮查看各位置分工</span>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           {isMultiLevel && (
