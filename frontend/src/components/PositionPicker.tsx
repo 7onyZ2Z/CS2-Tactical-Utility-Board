@@ -23,6 +23,9 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
   const [z, setZ] = useState(0);
   const [positions, setPositions] = useState<Record<number, PositionData | null>>({});
   const [dragging, setDragging] = useState<number | null>(null);
+  const [confirmed, setConfirmed] = useState(false);
+  const [dutyEditNum, setDutyEditNum] = useState<number | null>(null);
+  const dutyEditRef = useRef<number | null>(null);
   const radarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,27 +33,33 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
       setPositions({});
       setZ(0);
       setDragging(null);
+      setConfirmed(false);
     }
   }, [open]);
+
+  useEffect(() => {
+    setConfirmed(false);
+  }, [z]);
 
   const isMultiLevel = map ? MULTI_LEVEL_MAPS.has(map.name) : false;
   const radarUrl = map ? getRadarUrl(map.name, z) : '';
 
   const handleMouseDown = (e: React.MouseEvent, posNum: number) => {
+    if (confirmed) return;
     e.preventDefault();
     setDragging(posNum);
   };
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (dragging === null || !radarRef.current) return;
+      if (dragging === null || !radarRef.current || confirmed) return;
       const rect = radarRef.current.getBoundingClientRect();
       const x = Math.round(((e.clientX - rect.left) / rect.width) * 1000) / 10;
       const y = Math.round(((e.clientY - rect.top) / rect.height) * 1000) / 10;
       if (x < 0 || x > 100 || y < 0 || y > 100) return;
       setPositions((prev) => ({ ...prev, [dragging]: { x, y, z, duty: prev[dragging]?.duty } }));
     },
-    [dragging, z],
+    [dragging, z, confirmed],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -68,20 +77,28 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
     }
   }, [dragging, handleMouseMove, handleMouseUp]);
 
-  const handleDutyChange = (posNum: number, value: string) => {
-    setPositions((prev) => {
-      const existing = prev[posNum];
-      if (!existing) return prev;
-      return { ...prev, [posNum]: { ...existing, duty: value || undefined } };
-    });
+  const handleConfirmPlacement = () => {
+    setConfirmed(true);
   };
 
-  const handleConfirm = () => {
+  const handleFinish = () => {
     const result: Record<string, PositionData | null> = {};
     for (let i = 1; i <= 5; i++) {
       result[i] = positions[i] ?? null;
     }
     onConfirm(result);
+  };
+
+  const handleDutySave = (value: string) => {
+    const num = dutyEditRef.current;
+    if (num === null) return;
+    setPositions((prev) => {
+      const existing = prev[num];
+      if (!existing) return prev;
+      return { ...prev, [num]: { ...existing, duty: value || undefined } };
+    });
+    setDutyEditNum(null);
+    dutyEditRef.current = null;
   };
 
   const assignedCount = Object.values(positions).filter(Boolean).length;
@@ -93,23 +110,33 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
       onCancel={onCancel}
       centered
       width="auto"
-      footer={[
-        <Button key="clear" onClick={() => setPositions({})}>清除全部</Button>,
-        <Button key="cancel" onClick={onCancel}>取消</Button>,
-        <Button key="ok" type="primary" onClick={handleConfirm}>
-          确定 ({assignedCount}/5)
-        </Button>,
-      ]}
+      footer={
+        confirmed
+          ? [
+              <Button key="back" onClick={() => setConfirmed(false)}>返回调整</Button>,
+              <Button key="cancel" onClick={onCancel}>取消</Button>,
+              <Button key="finish" type="primary" onClick={handleFinish}>完成</Button>,
+            ]
+          : [
+              <Button key="clear" onClick={() => setPositions({})}>清除全部</Button>,
+              <Button key="cancel" onClick={onCancel}>取消</Button>,
+              <Button key="ok" type="primary" disabled={assignedCount === 0} onClick={handleConfirmPlacement}>
+                确定 ({assignedCount}/5)
+              </Button>,
+            ]
+      }
       styles={{ body: { padding: 0 } }}
     >
       <div style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        {isMultiLevel && (
+        {isMultiLevel && !confirmed && (
           <div style={{ display: 'flex', gap: 8 }}>
             <Button size="small" type={z === 0 ? 'primary' : 'default'} onClick={() => { setZ(0); setPositions({}); }}>上层</Button>
             <Button size="small" type={z === 1 ? 'primary' : 'default'} onClick={() => { setZ(1); setPositions({}); }}>下层</Button>
           </div>
         )}
-        <span style={{ color: '#b8956a', fontSize: 13 }}>拖动右侧数字到雷达图上分配位置</span>
+        <span style={{ color: '#b8956a', fontSize: 13 }}>
+          {confirmed ? '点击位置标记设置职责' : '拖动右侧数字到雷达图上分配位置'}
+        </span>
       </div>
       <div style={{ display: 'flex' }}>
         <div
@@ -136,7 +163,8 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
             return (
               <div
                 key={num}
-                onMouseDown={(e) => handleMouseDown(e, num)}
+                onMouseDown={(e) => confirmed ? undefined : handleMouseDown(e, num)}
+                onClick={() => { if (confirmed) { dutyEditRef.current = num; setDutyEditNum(num); } }}
                 style={{
                   position: 'absolute',
                   left: `${pos.x}%`,
@@ -152,7 +180,7 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
                   justifyContent: 'center',
                   fontWeight: 'bold',
                   fontSize: 9,
-                  cursor: 'grab',
+                  cursor: confirmed ? 'pointer' : 'grab',
                   boxShadow: `0 0 6px ${POS_COLORS[num - 1]}80`,
                   border: '1.5px solid #fff',
                   zIndex: 10,
@@ -164,7 +192,7 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
           })}
         </div>
         <div style={{
-          width: 150,
+          width: 60,
           display: 'flex',
           flexDirection: 'column',
           gap: 8,
@@ -175,9 +203,9 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
           {[1, 2, 3, 4, 5].map((num) => {
             const placed = !!positions[num];
             return (
-              <div key={num} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div key={num} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div
-                  onMouseDown={(e) => !placed && handleMouseDown(e, num)}
+                  onMouseDown={(e) => !placed && !confirmed && handleMouseDown(e, num)}
                   style={{
                     width: 20,
                     height: 20,
@@ -189,7 +217,7 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
                     justifyContent: 'center',
                     fontWeight: 'bold',
                     fontSize: 10,
-                    cursor: placed ? 'default' : 'grab',
+                    cursor: placed || confirmed ? 'default' : 'grab',
                     border: `1.5px solid ${POS_COLORS[num - 1]}`,
                     opacity: placed ? 0.4 : 1,
                     transition: 'opacity 0.2s',
@@ -198,26 +226,33 @@ export default function PositionPicker({ open, map, onConfirm, onCancel }: Props
                 >
                   {num}
                 </div>
-                <Input
-                  size="small"
-                  placeholder="职责"
-                  value={positions[num]?.duty ?? ''}
-                  disabled={!placed}
-                  onChange={(e) => handleDutyChange(num, e.target.value)}
-                  style={{
-                    width: 0,
-                    flex: 1,
-                    background: '#1a1612',
-                    borderColor: '#4a3d2e',
-                    color: '#f5ead6',
-                    fontSize: 11,
-                  }}
-                />
               </div>
             );
           })}
         </div>
       </div>
+
+      <Modal
+        title={`${dutyEditNum}号位职责`}
+        open={dutyEditNum !== null}
+        onCancel={() => { setDutyEditNum(null); dutyEditRef.current = null; }}
+        onOk={() => {
+          const input = document.getElementById('duty-input') as HTMLInputElement;
+          handleDutySave(input?.value ?? '');
+        }}
+        okText="确定"
+        cancelText="取消"
+        width={300}
+        destroyOnClose
+      >
+        <Input
+          id="duty-input"
+          autoFocus
+          placeholder="如：投掷A大闪光，后续为1号位补枪"
+          defaultValue={dutyEditNum !== null ? positions[dutyEditNum]?.duty ?? '' : ''}
+          onPressEnter={(e) => handleDutySave((e.target as HTMLInputElement).value)}
+        />
+      </Modal>
     </Modal>
   );
 }

@@ -203,7 +203,7 @@ export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticG
       <Modal
         title="新增战术"
         open={modalOpen}
-        onCancel={() => { setModalOpen(false); form.resetFields(); }}
+        onCancel={() => { setModalOpen(false); form.resetFields(); setPositions(null); setSelectedMapForPos(null); }}
         onOk={() => form.submit()}
         confirmLoading={confirmLoading}
         okText="创建"
@@ -244,7 +244,7 @@ export default function TacticGrid({ selectedMap, canCreate, onSelect }: TacticG
                 disabled={!selectedMapForPos}
                 onClick={() => setPosPickerOpen(true)}
               >
-                {positions ? '已分配 — 重新选择' : '分配位置'}
+                {positions ? '重新选择位置' : '分配位置'}
               </Button>
               {!selectedMapForPos && <span style={{ color: '#b8956a', fontSize: 12 }}>请先选择地图</span>}
             </div>
