@@ -81,10 +81,10 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               letterSpacing: 4,
               margin: 0,
             }}>
-              道具学院
+              学院CS
             </h1>
             <p style={{ color: WARM.brown, marginTop: 8, fontSize: 14 }}>
-              CS2 道具点位速查
+              CS2 战术｜道具 平台
             </p>
           </div>
           <Card style={{

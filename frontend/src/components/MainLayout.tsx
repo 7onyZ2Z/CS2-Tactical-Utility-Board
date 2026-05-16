@@ -34,7 +34,7 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
   const [detailLoading, setDetailLoading] = useState(false);
 
   const [selectedTactic, setSelectedTactic] = useState<TacticResponse | null>(null);
-  const [welcomeOpen, setWelcomeOpen] = useState(true);
+  const [welcomeOpen, setWelcomeOpen] = useState(() => !sessionStorage.getItem('welcome-shown'));
 
   const fetchLineups = useCallback(async () => {
     setLoading(true);
@@ -183,7 +183,7 @@ export default function MainLayout({ user, onLogout }: MainLayoutProps) {
       <Modal
         title="欢迎使用道具学院"
         open={welcomeOpen}
-        onCancel={() => setWelcomeOpen(false)}
+        onCancel={() => { setWelcomeOpen(false); sessionStorage.setItem('welcome-shown', '1'); }}
         footer={null}
         width={520}
       >
