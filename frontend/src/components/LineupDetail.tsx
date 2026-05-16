@@ -191,6 +191,9 @@ export default function LineupDetail({ lineup, loading, user, onBack, onDelete, 
         borderRadius: 8,
         overflow: 'hidden',
         marginBottom: 16,
+        maxWidth: '78%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
       }}>
         {images.length > 0 && (
           <div style={{ position: 'relative', aspectRatio: '16/9' }}>

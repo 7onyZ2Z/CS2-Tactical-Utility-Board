@@ -1,5 +1,12 @@
 import client from './client';
-import type { TacticResponse, TacticListResponse, TacticQueryParams, PositionData } from '../types';
+import type { TacticCountsResponse, TacticResponse, TacticListResponse, TacticQueryParams, PositionData } from '../types';
+
+export async function getTacticCounts(mapId?: number): Promise<TacticCountsResponse> {
+  const res = await client.get<TacticCountsResponse>('/api/tactics/counts', {
+    params: mapId ? { map_id: mapId } : undefined,
+  });
+  return res.data;
+}
 
 export async function getTactic(id: number): Promise<TacticResponse> {
   const res = await client.get<TacticResponse>(`/api/tactics/${id}`);

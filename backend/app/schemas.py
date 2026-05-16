@@ -96,6 +96,10 @@ class TacticListResponse(BaseModel):
     page_size: int
 
 
+class TacticCountsResponse(BaseModel):
+    maps: dict[str, int]
+
+
 # --- Lineups ---
 
 

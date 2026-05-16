@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { listMaps } from '../api/maps';
 import { getLineupCounts } from '../api/lineups';
-import type { MapResponse, LineupCountsResponse } from '../types';
+import { getTacticCounts } from '../api/tactics';
+import type { MapResponse, LineupCountsResponse, TacticCountsResponse } from '../types';
 import { ClearOutlined } from '@ant-design/icons';
 
 export const UTILITY_TYPES = [
@@ -61,19 +62,26 @@ export default function Sidebar({
   onSideChange,
 }: SidebarProps) {
   const [maps, setMaps] = useState<MapResponse[]>([]);
-  const [counts, setCounts] = useState<LineupCountsResponse>({ maps: {}, utilities: {}, sides: {} });
+  const [lineupCounts, setLineupCounts] = useState<LineupCountsResponse>({ maps: {}, utilities: {}, sides: {} });
+  const [tacticCounts, setTacticCounts] = useState<TacticCountsResponse>({ maps: {} });
 
   useEffect(() => {
     listMaps().then(setMaps);
   }, []);
 
   useEffect(() => {
-    getLineupCounts({
-      map_id: selectedMap ?? undefined,
-      utility_type: selectedUtility ?? undefined,
-      side: selectedSide ?? undefined,
-    }).then(setCounts);
-  }, [selectedMap, selectedUtility, selectedSide]);
+    if (view === 'lineups') {
+      getLineupCounts({
+        map_id: selectedMap ?? undefined,
+        utility_type: selectedUtility ?? undefined,
+        side: selectedSide ?? undefined,
+      }).then(setLineupCounts);
+    } else {
+      getTacticCounts(selectedMap ?? undefined).then(setTacticCounts);
+    }
+  }, [view, selectedMap, selectedUtility, selectedSide]);
+
+  const counts = view === 'lineups' ? lineupCounts : { maps: tacticCounts.maps, utilities: {}, sides: {} };
 
   const btnStyle = (active: boolean): React.CSSProperties => ({
     padding: '4px 6px',
@@ -125,13 +133,13 @@ export default function Sidebar({
         .sb-btn:hover { border-color: #d4a853 !important; }
       `}</style>
       <div style={{
-        width: view === 'tactics' ? 76 : '25vw',
-        minWidth: view === 'tactics' ? 76 : 240,
-        maxWidth: view === 'tactics' ? 76 : 320,
+        width: view === 'tactics' ? 76 : '13vw',
+        minWidth: view === 'tactics' ? 76 : 150,
+        maxWidth: view === 'tactics' ? 76 : 200,
         flexShrink: 0,
         background: '#221d18',
         borderRight: '1px solid #3d3628',
-        padding: view === 'tactics' ? 8 : 16,
+        padding: view === 'tactics' ? 8 : 10,
         overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column',
@@ -164,7 +172,7 @@ export default function Sidebar({
         ) : (
           <>
             <div style={sectionLabel}>地图</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, marginBottom: 12 }}>
               {maps.map((m) => {
                 const n = counts.maps[String(m.id)] ?? 0;
                 return (
@@ -178,10 +186,10 @@ export default function Sidebar({
                     <img
                       src={MAP_ICONS[m.name]}
                       alt={m.display_name}
-                      style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 2 }}
+                      style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 2 }}
                     />
                   )}
-                  <span>{m.display_name}</span>
+                  <span style={{ fontSize: 10 }}>{m.display_name}</span>
                   {n > 0 && <span style={countBadge(n)}>{n}</span>}
                 </div>
                 );
@@ -189,22 +197,22 @@ export default function Sidebar({
             </div>
 
             <div style={sectionLabel}>阵营</div>
-            <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, marginBottom: 12 }}>
               {SIDES.map((s) => {
                 const n = counts.sides[s.value] ?? 0;
                 return (
                 <div
                   key={s.value}
                   className="sb-btn"
-                  style={{ ...btnStyle(selectedSide === s.value), flex: 1 }}
+                  style={btnStyle(selectedSide === s.value)}
                   onClick={() => onSideChange(selectedSide === s.value ? null : s.value)}
                 >
                   <img
                     src={s.icon}
                     alt={s.label}
-                    style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 2 }}
+                    style={{ width: 24, height: 24, objectFit: 'contain', borderRadius: 2 }}
                   />
-                  <span>{s.label}</span>
+                  <span style={{ fontSize: 10 }}>{s.label}</span>
                   {n > 0 && <span style={countBadge(n)}>{n}</span>}
                 </div>
                 );
@@ -212,7 +220,7 @@ export default function Sidebar({
             </div>
 
             <div style={sectionLabel}>道具</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
               {UTILITY_TYPES.map((u) => {
                 const n = counts.utilities[u.value] ?? 0;
                 return (
@@ -225,9 +233,9 @@ export default function Sidebar({
                   <img
                     src={u.icon}
                     alt={u.label}
-                    style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 2 }}
+                    style={{ width: 24, height: 24, objectFit: 'contain', borderRadius: 2 }}
                   />
-                  <span>{u.label}</span>
+                  <span style={{ fontSize: 10 }}>{u.label}</span>
                   {n > 0 && <span style={countBadge(n)}>{n}</span>}
                 </div>
                 );

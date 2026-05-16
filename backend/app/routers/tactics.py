@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..dependencies import get_current_user, require_role
 from ..models import Lineup, Tactic, Map, User
-from ..schemas import TacticCreate, TacticListResponse, TacticResponse, TacticUpdate
+from ..schemas import TacticCountsResponse, TacticCreate, TacticListResponse, TacticResponse, TacticUpdate
+from sqlalchemy import func
 
 router = APIRouter(prefix="/api/tactics", tags=["tactics"])
 
@@ -38,6 +39,19 @@ def list_tactics(
     )
 
     return TacticListResponse(items=items, total=total, page=page, page_size=page_size)
+
+
+@router.get("/counts", response_model=TacticCountsResponse)
+def get_tactic_counts(
+    map_id: int | None = None,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(get_current_user),
+):
+    base = db.query(Tactic)
+    if map_id is not None:
+        base = base.filter(Tactic.map_id == map_id)
+    rows = base.with_entities(Tactic.map_id, func.count(Tactic.id)).group_by(Tactic.map_id).all()
+    return TacticCountsResponse(maps={str(k): v for k, v in rows})
 
 
 @router.get("/{tactic_id}", response_model=TacticResponse)

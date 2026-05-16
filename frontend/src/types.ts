@@ -94,6 +94,10 @@ export interface TacticResponse {
   created_by: number;
 }
 
+export interface TacticCountsResponse {
+  maps: Record<string, number>;
+}
+
 export interface TacticListResponse {
   items: TacticResponse[];
   total: number;
